@@ -3,12 +3,13 @@ import useAxios from "../hooks/UseAxios";
 import Cookies from 'js-cookie';
 import UserForm from "../components/forms/UserForm";
 import SocialNetworkBtns from "../components/uiComponents/SocialNetworkBtns";
+import ClientChat from "./ClientChat";
 
 const Contact = () => {
     const [showForm, setShowForm] = useState(true);
 
     useEffect(() => {
-        if (Cookies.get('name')) {
+        if (Cookies.get('email') !== undefined) {
             setShowForm(false);
         }
     }, []);
@@ -18,17 +19,21 @@ const Contact = () => {
         if (response?.status === 403) {
             setShowForm(true);
         } else {
+            Cookies.set('email', formData.email, {expires: 2});
+            Cookies.set('username', formData.name, {expires: 2});
             setShowForm(false);
         }
     }
 
     return (
         <div className="contact">
-            {showForm && (
+            {showForm === true ? (
                 <>
                     <UserForm onSubmit={handleSubmit} />
                     <SocialNetworkBtns />
                 </>
+            ) : (
+                <ClientChat userEmail={Cookies.get('email')} />
             )}
         </div>
     );
