@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 
-const Navbar = () => {
+const Navbar = ({ adminMode }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   const navItems = [
-    { label: 'Home', path: '/home' },
-    { label: 'Contact', path: '/contact' },
+    { label: 'Home', path: '/home', adminItem: false },
+    { label: 'Contact', path: '/contact', adminItem: false },
   ];
+
+  const filteredItems = navItems.filter(
+    (item) => !item.adminItem || (adminMode && item.adminItem)
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,12 +33,9 @@ const Navbar = () => {
       <div className="header-container">
         <nav className="desktop-nav">
           <ul>
-            {navItems.map(({ label, path }) => (
+            {filteredItems.map(({ label, path }) => (
               <li key={path}>
-                <Link 
-                  to={path} 
-                  className={location.pathname === path ? 'active' : ''}
-                >
+                <Link to={path} className={location.pathname === path ? 'active' : ''}>
                   {label}
                 </Link>
               </li>
@@ -42,7 +43,7 @@ const Navbar = () => {
           </ul>
         </nav>
 
-        <button 
+        <button
           className="mobile-menu-toggle"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -51,12 +52,9 @@ const Navbar = () => {
 
         <div className={`mobile-menu ${isMobileMenuOpen ? 'open' : ''}`}>
           <ul>
-            {navItems.map(({ label, path }) => (
+            {filteredItems.map(({ label, path }) => (
               <li key={path}>
-                <Link 
-                  to={path}
-                  className={location.pathname === path ? 'active' : ''}
-                >
+                <Link to={path} className={location.pathname === path ? 'active' : ''}>
                   {label}
                 </Link>
               </li>

@@ -61,22 +61,12 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
 
     wsManager.current.addMessageHandler((message: { payload: string; sender: string }) => {
       try {
-        console.log(message.sender);
         switch (message.sender) {
           case SERVER_ROLE:
             handleServerMessages(message);
             break;
           case ADMIN_ROLE:
             handleAdminMessages(message);
-            break;
-          default:
-            const newMessage: Message = JSON.parse(message.payload);
-            setMessages((prev) => {
-              if (!prev.some((msg) => msg.id === newMessage.id)) {
-                return [...prev, newMessage].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-              }
-              return prev;
-            });
             break;
         }
       } catch (err) {
