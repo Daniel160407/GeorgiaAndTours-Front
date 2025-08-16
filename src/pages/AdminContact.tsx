@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Cookies from 'js-cookie';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import UsersList from '../components/lists/UsersList';
@@ -24,15 +23,22 @@ interface Message {
 }
 
 interface ServerMessage {
+  senderEmail: string;
   sender: string;
   receiver?: string;
   subject?: string;
   payload: string;
 }
 
+interface User {
+  id?: number | string;
+  email: string;
+  name?: string;
+}
+
 const AdminContact = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState({});
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isDisconnected, setIsDisconnected] = useState<boolean>(false);
@@ -60,6 +66,30 @@ const AdminContact = () => {
   }, []);
 
   useEffect(() => {
+    const initialize = async () => {
+      await fetchUsers();
+      initializeWebSocket();
+    };
+    initialize();
+
+    return () => {
+      wsManager.current?.disconnect();
+      wsManager.current = null;
+
+      if (reconnectTimer.current) {
+        clearTimeout(reconnectTimer.current);
+        reconnectTimer.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (users.length > 0 && !selectedUser) {
+      setSelectedUser(users[0]);
+    }
+  }, [users]);
+
+  useEffect(() => {
     if (selectedUser) {
       fetchMessages();
 
@@ -74,11 +104,13 @@ const AdminContact = () => {
   }, [selectedUser]);
 
   const fetchMessages = async () => {
+    if (!selectedUser) return;
     try {
-      const response = await useAxios.get(`/messages?id=${selectedUser.id}`);
+      const response = await useAxios.get(`/messages?email=${selectedUser.email}`);
       setMessages(
         response.data.sort(
-          (a: Message, b: Message) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+          (a: Message, b: Message) =>
+            new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
         ),
       );
     } catch (error) {
@@ -107,7 +139,9 @@ const AdminContact = () => {
             handleServerMessages(message);
             break;
           default:
-            setMessages((prev) => [...prev, message]);
+            if (selectedUser && message.senderEmail === selectedUser.email) {
+              setMessages((prev) => [...prev, message]);
+            }
             fetchUsers();
             break;
         }
