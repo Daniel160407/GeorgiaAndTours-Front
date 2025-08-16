@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import useAxios from '../hooks/UseAxios';
 import Cookies from 'js-cookie';
 import UserForm from '../components/forms/UserForm';
 import SocialNetworkBtns from '../components/uiComponents/SocialNetworkBtns';
@@ -8,35 +7,32 @@ import Navbar from '../components/navigation/Navbar';
 
 const Contact = () => {
   const [showForm, setShowForm] = useState(true);
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
-    if (Cookies.get('email') !== undefined) {
+    if (Cookies.get('email')) {
       setShowForm(false);
     }
   }, []);
 
-  const handleSubmit = async (formData: unknown) => {
-    const response = await useAxios.post('/user', formData);
-    if (response?.status === 403) {
-      setShowForm(true);
-    } else {
-      Cookies.set('email', formData.email, { expires: 2 });
-      Cookies.set('username', formData.name, { expires: 2 });
-      setShowForm(false);
-    }
+  const handleFormSubmit = (data) => {
+    setFormData(data);
+    Cookies.set('email', data.email, { expires: 2 });
+    Cookies.set('name', data.name, { expires: 2 });
+    setShowForm(false);
   };
 
   return (
     <>
       <Navbar adminMode={false} />
       <div className="contact">
-        {showForm === true ? (
+        {showForm ? (
           <>
-            <UserForm onSubmit={handleSubmit} />
+            <UserForm onSubmit={handleFormSubmit} />
             <SocialNetworkBtns />
           </>
         ) : (
-          <ClientChat userEmail={Cookies.get('email')} />
+          <ClientChat userEmail={Cookies.get('email')} formData={formData} setShowForm={setShowForm} />
         )}
       </div>
     </>

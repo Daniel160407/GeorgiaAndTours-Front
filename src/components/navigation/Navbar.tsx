@@ -8,13 +8,11 @@ const Navbar = ({ adminMode }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   const navItems = [
-    { label: 'Home', path: '/home', adminItem: false },
-    { label: 'Contact', path: '/contact', adminItem: false },
+    { label: 'Home', path: adminMode ? '/adminpanel/home' : '/home', adminItem: false },
+    { label: 'Contact', path: adminMode ? '/adminpanel/contact' : '/contact', adminItem: false },
   ];
 
-  const filteredItems = navItems.filter(
-    (item) => !item.adminItem || (adminMode && item.adminItem)
-  );
+  const filteredItems = navItems.filter((item) => !item.adminItem || (adminMode && item.adminItem));
 
   useEffect(() => {
     const handleScroll = () => {

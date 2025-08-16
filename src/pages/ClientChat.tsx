@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Cookies from 'js-cookie';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
-import { ADMIN_ROLE, CLIENT_ROLE, SERVER_ROLE, WEBSOCKET_SID } from '../Constants';
+import { ADMIN_ROLE, CLIENT_ROLE, SERVER_ROLE, USER_CREATION, WEBSOCKET_SID } from '../Constants';
 
 interface Message {
   id?: number | string;
@@ -11,13 +11,16 @@ interface Message {
   sender: string;
   receiver: string;
   payload: string;
+  date?: string;
 }
 
 interface ClientChatProps {
   userEmail: string;
+  formData: any;
+  setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
+const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowForm }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isDisconnected, setIsDisconnected] = useState<boolean>(false);
@@ -25,41 +28,88 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const wsManager = useRef<WebSocketManager | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isConnectingRef = useRef(false);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await useAxios.get(`/messages/${userEmail}`);
-        setMessages(response.data.sort((a: Message, b: Message) => new Date(a.date).getTime() - new Date(b.date).getTime()));
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      } finally {
-        setLoading(false);
+  const handleServerMessages = useCallback((message: { payload: string; subject: string }) => {
+    switch (message.subject) {
+      case WEBSOCKET_SID:
+        Cookies.set('sid', message.payload, { expires: 2 });
+        sendSidWithUserData(message.payload);
+        break;
+    }
+  }, []);
+
+  const handleAdminMessages = useCallback((message: { payload: string }) => {
+    setMessages((prev) => [...prev, message]);
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const sendSidWithUserData = (sid) => {
+    const message = {
+      senderEmail: Cookies.get('email'),
+      sender: CLIENT_ROLE,
+      subject: WEBSOCKET_SID,
+      payload: sid,
+    };
+    wsManager.current?.send(message);
+  };
+
+  const sendMessage = useCallback(() => {
+    const message = {
+      sender: CLIENT_ROLE,
+      subject: USER_CREATION,
+      payload: JSON.stringify(formData),
+    };
+    wsManager.current?.send(message);
+    setShowForm(false);
+  }, [formData, setShowForm]);
+
+  const sendUserCreationMessage = useCallback(() => {
+    if (!wsManager.current?.isConnected()) {
+      const retry = () => {
+        if (wsManager.current?.isConnected()) {
+          sendMessage();
+        } else {
+          setTimeout(retry, 1000);
+        }
+      };
+      retry();
+    } else {
+      sendMessage();
+    }
+  }, [sendMessage]);
+
+  const retryConnection = useCallback(() => {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+    retryTimeoutRef.current = setTimeout(() => {
+      if (!wsManager.current?.isConnected() && !isConnectingRef.current) {
+        initializeWebSocket();
       }
-    };
+    }, 3000);
+  }, []);
 
-    fetchMessages();
-    initializeWebSocket();
+  const initializeWebSocket = useCallback(() => {
+    if (isConnectingRef.current) return;
+    isConnectingRef.current = true;
 
-    return () => {
-      wsManager.current?.disconnect();
-    };
-  }, [userEmail]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const initializeWebSocket = () => {
     setIsDisconnected(false);
     setLoading(true);
 
-    wsManager.current?.disconnect();
+    if (wsManager.current) {
+      wsManager.current.disconnect();
+      wsManager.current = null;
+    }
 
     wsManager.current = new WebSocketManager('/socket');
     wsManager.current.connect();
 
-    wsManager.current.addMessageHandler((message: { payload: string; sender: string }) => {
+    const messageHandler = (message: { payload: string; sender: string }) => {
       try {
         switch (message.sender) {
           case SERVER_ROLE:
@@ -72,64 +122,112 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
       } catch (err) {
         console.error('Error parsing incoming message:', err);
       }
-    });
+    };
 
-    wsManager.current.addConnectionListener('open', () => {
+    const openHandler = () => {
       console.log('Chat WebSocket connected');
+      isConnectingRef.current = false;
       setIsDisconnected(false);
       setLoading(false);
-    });
+      if (formData && Object.keys(formData).length > 0) {
+        sendUserCreationMessage();
+      }
+    };
 
-    wsManager.current.addConnectionListener('close', () => {
+    const closeHandler = () => {
       console.warn('Chat WebSocket disconnected. Trying to reconnect...');
+      isConnectingRef.current = false;
       setIsDisconnected(true);
       setLoading(false);
       retryConnection();
-    });
+    };
 
-    wsManager.current.addConnectionListener('error', (err: Event) => {
+    const errorHandler = (err: Event) => {
       console.error('Chat WebSocket error:', err);
+      isConnectingRef.current = false;
       setIsDisconnected(true);
       setLoading(false);
       retryConnection();
-    });
-  };
+    };
 
-  const retryConnection = () => {
-    setTimeout(() => {
-      if (!wsManager.current?.isConnected?.()) {
+    wsManager.current.addMessageHandler(messageHandler);
+    wsManager.current.addConnectionListener('open', openHandler);
+    wsManager.current.addConnectionListener('close', closeHandler);
+    wsManager.current.addConnectionListener('error', errorHandler);
+
+    return () => {
+      wsManager.current?.removeMessageHandler(messageHandler);
+      wsManager.current?.removeConnectionListener('open', openHandler);
+      wsManager.current?.removeConnectionListener('close', closeHandler);
+      wsManager.current?.removeConnectionListener('error', errorHandler);
+    };
+  }, [
+    formData,
+    handleAdminMessages,
+    handleServerMessages,
+    retryConnection,
+    sendUserCreationMessage,
+  ]);
+
+  useEffect(() => {
+    const newMessage: Message = {
+      senderEmail: userEmail,
+      receiverEmail: '',
+      sender: Cookies.get('username') || CLIENT_ROLE,
+      receiver: SERVER_ROLE,
+      payload: Cookies.get('sid'),
+    };
+
+    if (wsManager.current?.isConnected()) {
+      wsManager.current.send(JSON.stringify(newMessage));
+    }
+  }, [initializeWebSocket]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await useAxios.get(`/messages?email=${userEmail}`);
+        setMessages(
+          response.data.sort(
+            (a: Message, b: Message) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+          ),
+        );
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+
+    if (!wsManager.current?.isConnected()) {
+      initializeWebSocket();
+    }
+
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, [userEmail, initializeWebSocket]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (formData && Object.keys(formData).length > 0) {
+      if (wsManager.current?.isConnected()) {
+        sendMessage();
+      } else {
         initializeWebSocket();
       }
-    }, 3000);
-  };
-
-  const handleServerMessages = (message: { payload: string; sender: string }) => {
-    if (message.sender === SERVER_ROLE && message.payload === WEBSOCKET_SID) {
-      Cookies.set('sid', message.payload, { expires: 2 });
-      console.log('Session ID set:', message.payload);
     }
-  };
-
-  const handleAdminMessages = (message: { payload: string }) => {
-    try {
-      const newMessage: Message = JSON.parse(message.payload);
-      setMessages((prev) => {
-        if (!prev.some((msg) => msg.id === newMessage.id)) {
-          return [...prev, newMessage].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        }
-        return prev;
-      });
-    } catch (err) {
-      console.error('Error parsing admin message:', err);
-    }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [formData, initializeWebSocket, sendMessage]);
 
   const handleSend = () => {
-    if (inputText.trim() === '') return;
+    if (!inputText.trim()) return;
 
     const newMessage: Message = {
       senderEmail: userEmail,
@@ -142,8 +240,8 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
     setMessages((prev) => [...prev, newMessage]);
     setInputText('');
 
-    if (wsManager.current?.isConnected?.()) {
-      wsManager.current.send(newMessage);
+    if (wsManager.current?.isConnected()) {
+      wsManager.current.send(JSON.stringify(newMessage));
     }
   };
 
@@ -158,11 +256,8 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
     <div className="client-chat">
       <div className="header">
         <p>Get a quick answer on any question</p>
-        {(isDisconnected || loading) && (
-          <div className="chat-connection-status">Connecting...</div>
-        )}
+        {(isDisconnected || loading) && <div className="chat-connection-status">Connecting...</div>}
       </div>
-
       <div className="messages-container">
         {messages.map((message) => (
           <div
@@ -183,7 +278,6 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-
       <div className="input-area">
         <textarea
           value={inputText}
@@ -193,11 +287,7 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail }) => {
           rows={1}
         />
         <button onClick={handleSend} disabled={!inputText.trim()}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
         </button>
