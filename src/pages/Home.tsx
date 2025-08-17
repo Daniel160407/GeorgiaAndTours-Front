@@ -7,12 +7,16 @@ import LanguageSwitcher from '../components/uiComponents/LanguageSwitcher';
 import ToursList from '../components/lists/ToursList';
 import SortBySelector from '../components/uiComponents/SortBySelector';
 import useAxios from '../hooks/UseAxios';
+import ExtendedTour from '../components/model/ExtendedTour';
 
 const Home = () => {
   const [searchValue, setSearchValue] = useState('');
   const [language, setLanguage] = useState('ENG');
   const [sortBy, setSortBy] = useState('name');
   const [tours, setTours] = useState([]);
+  const [selectedTour, setSelectedTour] = useState({});
+  const [showExtendedTour, setShowExtendedTour] = useState(false);
+  const [comments, setComments] = useState([]);
 
   const handleSearch = async () => {
     try {
@@ -22,6 +26,23 @@ const Home = () => {
       console.error('Error searching tours:', error);
     }
   };
+
+  const handleTourClick = (tour) => {
+    setSelectedTour(tour);
+    setShowExtendedTour(true);
+
+    const fetchComments = async () => {
+      const response = await useAxios.get(`/comments/${tour.id}`);
+      setComments(response.data);
+    }
+
+    fetchComments();
+  }
+
+  const handleCommitSubmit = async (formData: unknown) => {
+    const response = await useAxios.post(`/comments`, formData);
+    setComments(response.data);
+  }
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -45,7 +66,10 @@ const Home = () => {
         <LanguageSwitcher value={language} setValue={setLanguage} />
         <Slides />
         <SortBySelector value={sortBy} setValue={setSortBy} />
-        <ToursList tours={tours} />
+        <ToursList tours={tours} onTourClick={handleTourClick} />
+        {showExtendedTour && (
+          <ExtendedTour tour={selectedTour} comments={comments} onCommentSubmit={handleCommitSubmit} />
+        )}
       </div>
     </>
   );

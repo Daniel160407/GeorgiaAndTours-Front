@@ -1,6 +1,6 @@
-const Tour = ({ tour }) => {
+const Tour = ({ tour, onClick }) => {
   return (
-    <div className="tour">
+    <div className="tour" onClick={() => onClick(tour)}>
       <div className="image-container">
         <img src={tour.imageUrl} />
       </div>
