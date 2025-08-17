@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react';
-import Search from '../components/uiComponents/Search';
-import Logo from '../components/uiComponents/Logo';
-import Slides from '../components/uiComponents/Slides';
 import Navbar from '../components/navigation/Navbar';
-import LanguageSwitcher from '../components/uiComponents/LanguageSwitcher';
-import ToursList from '../components/lists/ToursList';
-import SortBySelector from '../components/uiComponents/SortBySelector';
+import Logo from '../components/uiComponents/Logo';
+import Search from '../components/uiComponents/Search';
 import useAxios from '../hooks/UseAxios';
-import ExtendedTour from '../components/model/ExtendedTour';
+import LanguageSwitcher from '../components/uiComponents/LanguageSwitcher';
+import Slides from '../components/uiComponents/Slides';
+import SortBySelector from '../components/uiComponents/SortBySelector';
+import AdminToursList from '../components/lists/AdminToursList';
 
-const Home = () => {
+const AdminHome = () => {
   const [searchValue, setSearchValue] = useState('');
   const [language, setLanguage] = useState('ENG');
   const [sortBy, setSortBy] = useState('name');
   const [tours, setTours] = useState([]);
-  const [selectedTour, setSelectedTour] = useState({});
-  const [showExtendedTour, setShowExtendedTour] = useState(false);
-  const [comments, setComments] = useState([]);
+
+  const handleEdit = async (updatedTour) => {
+    const response = await useAxios.put('/tours', updatedTour);
+    setTours(response.data);
+  };
+
+  const handleDelete = async (id) => {
+    const response = await useAxios.delete(`/tours/${id}`);
+    setTours(response.data);
+  }
 
   const handleSearch = async () => {
     try {
@@ -27,21 +33,9 @@ const Home = () => {
     }
   };
 
-  const handleTourClick = (tour) => {
-    setSelectedTour(tour);
-    setShowExtendedTour(true);
-
-    const fetchComments = async () => {
-      const response = await useAxios.get(`/comments/${tour.id}`);
-      setComments(response.data);
-    }
-
-    fetchComments();
-  }
-
-  const handleCommitSubmit = async (formData: unknown) => {
-    const response = await useAxios.post(`/comments`, formData);
-    setComments(response.data);
+  const handleNewTour = async (newTour) => {
+    const response = await useAxios.post('/tours', newTour);
+    setTours(response.data);
   }
 
   useEffect(() => {
@@ -59,20 +53,17 @@ const Home = () => {
 
   return (
     <>
-      <Navbar adminMode={false} />
-      <div className="home">
+      <Navbar adminMode={true} />
+      <div className="admin-home">
         <Logo />
         <Search value={searchValue} setValue={setSearchValue} onSubmit={handleSearch} />
         <LanguageSwitcher value={language} setValue={setLanguage} />
         <Slides />
         <SortBySelector value={sortBy} setValue={setSortBy} />
-        <ToursList tours={tours} onTourClick={handleTourClick} />
-        {showExtendedTour && (
-          <ExtendedTour tour={selectedTour} comments={comments} onCommentSubmit={handleCommitSubmit} />
-        )}
+        <AdminToursList tours={tours} onEdit={handleEdit} onDelete={handleDelete} onNewTour={handleNewTour}/>
       </div>
     </>
   );
 };
 
-export default Home;
+export default AdminHome;
