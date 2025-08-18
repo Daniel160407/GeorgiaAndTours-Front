@@ -1,27 +1,12 @@
-import { useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import AdminTourEditForm from '../forms/TourEditForm';
+import '../../styles/model/AdminTour.scss';
+import TourEditForm from '../forms/TourEditForm';
 
-const AdminTour = ({ tour, onEdit, onDelete }) => {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleFormSubmit = async (updatedTour) => {
-    setIsEditing(false);
-    onEdit(updatedTour);
-  };
-
-  const handleDelete = () => {
-    onDelete(tour.id);
-  };
-
+const AdminTour = ({ tour, onEdit, onDelete, onEditStart, isEditing }) => {
   return (
     <div className="admin-tour">
       <div className="image-container">
-        <img src={tour.imageUrl} />
+        <img src={tour.imageUrl} alt={tour.name} />
       </div>
       <div className="tour-info">
         <h1 className="tour-title">{tour.name}</h1>
@@ -30,16 +15,10 @@ const AdminTour = ({ tour, onEdit, onDelete }) => {
         <p className="tour-price">{tour.price}</p>
       </div>
       <div className="actions">
-        <FaEdit onClick={handleEdit} style={{ cursor: 'pointer', marginRight: '10px' }} />
-        <FaTrash onClick={handleDelete} style={{ cursor: 'pointer' }} />
+        <FaEdit onClick={onEditStart} style={{ cursor: 'pointer', marginRight: '10px' }} />
+        <FaTrash onClick={() => onDelete(tour.id)} style={{ cursor: 'pointer' }} />
       </div>
-      {isEditing && (
-        <AdminTourEditForm
-          tour={tour}
-          onSubmit={handleFormSubmit}
-          onCancel={() => setIsEditing(false)}
-        />
-      )}
+      {isEditing && <TourEditForm tour={tour} onSubmit={onEdit} onCancel={onEditStart} />}
     </div>
   );
 };

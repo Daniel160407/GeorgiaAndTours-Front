@@ -1,0 +1,212 @@
+.tour {
+  $primary-color: #4a90e2;
+  $accent-color: #e74c3c;
+  $light-bg: #f9f9f9;
+  $text-color: #333;
+  $light-text: #777;
+  $border-radius: 12px;
+  $shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  $transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  position: relative;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $shadow;
+  cursor: pointer;
+  background: white;
+  transition: $transition;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    
+    .image-container::before {
+      opacity: 1;
+    }
+    
+    .image-container img {
+      transform: scale(1.08);
+    }
+    
+    .tour-info {
+      background: $light-bg;
+    }
+    
+    .cta-button {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .image-container {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+      z-index: 2;
+      opacity: 0.6;
+      transition: $transition;
+    }
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: $transition;
+      display: block;
+    }
+  }
+
+  .tour-info {
+    padding: 1.8rem;
+    transition: $transition;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .tour-title {
+      margin: 0 0 1rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-color;
+      line-height: 1.3;
+      position: relative;
+      padding-bottom: 0.8rem;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: $primary-color;
+        border-radius: 2px;
+      }
+    }
+    
+    .tour-direction,
+    .tour-duration,
+    .tour-price {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+      font-size: 1.05rem;
+      color: $light-text;
+      
+      &::before {
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+      }
+    }
+    
+    .tour-price {
+      color: $accent-color;
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin-top: 1rem;
+    }
+  }
+
+  .cta-button {
+    position: absolute;
+    bottom: 40%;
+    left: 50%;
+    transform: translate(-50%, 20px);
+    background: $primary-color;
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: $transition;
+    opacity: 0;
+    z-index: 3;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    
+    &:hover {
+      background: darken($primary-color, 8%);
+      transform: translate(-50%, -3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .tour-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: $accent-color;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    z-index: 3;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 992px) {
+    .image-container {
+      height: 220px;
+    }
+    
+    .tour-info {
+      padding: 1.5rem;
+      
+      .tour-title {
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .image-container {
+      height: 200px;
+    }
+    
+    .tour-info {
+      padding: 1.3rem;
+      
+      .tour-title {
+        font-size: 1.3rem;
+      }
+      
+      .tour-direction,
+      .tour-duration,
+      .tour-price {
+        font-size: 1rem;
+      }
+      
+      .tour-price {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .image-container {
+      height: 180px;
+    }
+    
+    .cta-button {
+      padding: 0.8rem 1.8rem;
+      font-size: 1rem;
+    }
+  }
+}

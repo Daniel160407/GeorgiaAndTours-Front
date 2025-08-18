@@ -1,3 +1,5 @@
+import '../../styles/model/Comment.scss';
+
 const Comment = ({ comment }) => {
     return (
         <div className="comment">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import '../../styles/forms/TourForm.scss';
 
-const TourForm = ({ onSubmit }) => {
+const TourForm = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     imageUrl: '',
     name: '',
@@ -26,105 +27,152 @@ const TourForm = ({ onSubmit }) => {
   };
 
   return (
-    <form className="tour-form" onSubmit={handleSubmit}>
-      <div className="form-group">
-        <label htmlFor="imageUrl">Image URL</label>
-        <input
-          type="text"
-          id="imageUrl"
-          name="imageUrl"
-          value={formData.imageUrl}
-          onChange={handleChange}
-          placeholder="Enter image URL"
-          required
-        />
+    <div className="tour-form-container">
+      <div className="form-header">
+        <h2>Create New Tour</h2>
+        <div className="header-decoration"></div>
+        <div className="form-header">
+            <button
+              className="close-btn"
+              onClick={() => onCancel(false)}
+              aria-label="Close form"
+            >
+              &times;
+            </button>
+          </div>
       </div>
-      <div className="form-group">
-        <label htmlFor="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter tour name"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="description">Description</label>
-        <input
-          type="text"
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter tour description"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="requirements">Requirements</label>
-        <input
-          type="text"
-          id="requirements"
-          name="requirements"
-          value={formData.requirements}
-          onChange={handleChange}
-          placeholder="Enter requirements"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="price">Price</label>
-        <input
-          type="number"
-          id="price"
-          name="price"
-          value={formData.price}
-          onChange={handleChange}
-          placeholder="Enter tour price"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="duration">Duration</label>
-        <input
-          type="text"
-          id="duration"
-          name="duration"
-          value={formData.duration}
-          onChange={handleChange}
-          placeholder="Enter tour duration"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="direction">Direction</label>
-        <input
-          type="text"
-          id="direction"
-          name="direction"
-          value={formData.direction}
-          onChange={handleChange}
-          placeholder="Enter tour direction"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="language">Language</label>
-        <input
-          type="text"
-          id="language"
-          name="language"
-          value={formData.language}
-          onChange={handleChange}
-          placeholder="Enter tour language"
-          required
-        />
-      </div>
-      <button type="submit">Add Tour</button>
-    </form>
+      
+      <form className="tour-form" onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="imageUrl">
+              <i className="icon-image"></i> Image URL
+            </label>
+            <input
+              type="text"
+              id="imageUrl"
+              name="imageUrl"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              placeholder="https://example.com/tour-image.jpg"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="name">
+              <i className="icon-tour"></i> Tour Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Amazing Mountain Adventure"
+              required
+            />
+          </div>
+          
+          <div className="form-group full-width">
+            <label htmlFor="description">
+              <i className="icon-description"></i> Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Describe the tour experience in detail..."
+              required
+              rows="4"
+            ></textarea>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="requirements">
+              <i className="icon-requirements"></i> Requirements
+            </label>
+            <input
+              type="text"
+              id="requirements"
+              name="requirements"
+              value={formData.requirements}
+              onChange={handleChange}
+              placeholder="Physical fitness, equipment, etc."
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="price">
+              <i className="icon-price"></i> Price ($)
+            </label>
+            <input
+              type="text"
+              id="price"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="199"
+              required
+              min="0"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="duration">
+              <i className="icon-duration"></i> Duration
+            </label>
+            <input
+              type="text"
+              id="duration"
+              name="duration"
+              value={formData.duration}
+              onChange={handleChange}
+              placeholder="3 days / 2 nights"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="direction">
+              <i className="icon-direction"></i> Direction
+            </label>
+            <input
+              type="text"
+              id="direction"
+              name="direction"
+              value={formData.direction}
+              onChange={handleChange}
+              placeholder="Starting location"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="language">
+              <i className="icon-language"></i> Language
+            </label>
+            <input
+              type="text"
+              id="language"
+              name="language"
+              value={formData.language}
+              onChange={handleChange}
+              placeholder="English, Spanish, etc."
+              required
+            />
+          </div>
+        </div>
+        
+        <div className="form-actions">
+          <button type="submit" className="submit-btn">
+            <i className="icon-add"></i> Add Tour
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

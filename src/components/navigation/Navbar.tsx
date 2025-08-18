@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
+import '../../styles/navigation/Navbar.scss';
 
 const Navbar = ({ adminMode }) => {
   const location = useLocation();

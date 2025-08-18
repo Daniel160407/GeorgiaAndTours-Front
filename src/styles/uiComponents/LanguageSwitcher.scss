@@ -1,0 +1,124 @@
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2c3e50;
+$light-bg: #f8f9fa;
+$border-color: rgba(0, 0, 0, 0.1);
+$transition-speed: 0.2s;
+
+.language-switcher {
+  position: relative;
+  display: inline-block;
+  min-width: 100px;
+  
+  // Custom dropdown arrow
+  &::after {
+    content: "▼";
+    font-size: 0.6em;
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: $secondary-color;
+    transition: transform $transition-speed ease;
+  }
+
+  &:hover::after {
+    color: $primary-color;
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 0.5em 2em 0.5em 1em;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: $secondary-color;
+    background-color: $light-bg;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all $transition-speed ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    // Remove default arrow in IE
+    &::-ms-expand {
+      display: none;
+    }
+
+    &:hover {
+      border-color: rgba($primary-color, 0.3);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+
+      ~ .language-switcher::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+    }
+  }
+
+  // Language option styling
+  option {
+    padding: 0.5em;
+    background: white;
+    color: $secondary-color;
+    
+    &:checked {
+      background-color: rgba($primary-color, 0.1);
+      font-weight: 600;
+    }
+  }
+}
+
+// Small size variant
+.language-switcher.small {
+  min-width: 80px;
+  
+  select {
+    padding: 0.3em 1.8em 0.3em 0.8em;
+    font-size: 0.8em;
+  }
+}
+
+// Minimal version (borderless)
+.language-switcher.minimal {
+  select {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding-right: 1.5em;
+    
+    &:hover, &:focus {
+      background: rgba(0, 0, 0, 0.02);
+    }
+  }
+  
+  &::after {
+    right: 5px;
+  }
+}
+
+// Dark theme variant
+.dark-mode .language-switcher {
+  select {
+    background-color: lighten($secondary-color, 10%);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.1);
+    
+    option {
+      background: $secondary-color;
+      color: white;
+    }
+  }
+  
+  &::after {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}

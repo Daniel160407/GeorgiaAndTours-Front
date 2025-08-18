@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import CommentsList from '../lists/CommentsList';
 import CommentForm from '../forms/CommentForm';
+import '../../styles/model/ExtendedTour.scss';
+import BackBtn from '../uiComponents/BackBtn';
 
 interface Tour {
   id: string;
@@ -26,9 +28,9 @@ interface Translations {
 
 type Language = 'ENG' | 'RUS';
 
-const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
+const ExtendedTour = ({ tour, comments, onCommentSubmit, onBackArrowClick }: { tour: Tour }) => {
   const [activeLanguage, setActiveLanguage] = useState<Language>('ENG');
-  
+
   const translations: Translations = {
     ENG: {
       descriptionTitle: 'Tour description',
@@ -36,7 +38,7 @@ const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
       detailsTitle: 'Tour details',
       duration: 'Duration',
       price: 'Price',
-      direction: 'Direction'
+      direction: 'Direction',
     },
     RUS: {
       descriptionTitle: 'Описание тура',
@@ -44,8 +46,8 @@ const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
       detailsTitle: 'Детали тура',
       duration: 'Продолжительность',
       price: 'Цена',
-      direction: 'Направление'
-    }
+      direction: 'Направление',
+    },
   };
 
   const handleLanguageChange = (language: Language) => {
@@ -54,6 +56,7 @@ const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
 
   return (
     <article className="extended-tour">
+      <BackBtn onClick={onBackArrowClick} />
       <div className="language-selector">
         {(['ENG', 'RUS'] as Language[]).map((language) => (
           <button
@@ -67,12 +70,7 @@ const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
       </div>
 
       <div className="tour-header">
-        <img 
-          src={tour.imageUrl} 
-          alt={tour.name} 
-          className="tour-image"
-          loading="lazy"
-        />
+        <img src={tour.imageUrl} alt={tour.name} className="tour-image" loading="lazy" />
         <h1 className="tour-title">{tour.name}</h1>
       </div>
 
@@ -96,8 +94,17 @@ const ExtendedTour = ({ tour, comments, onCommentSubmit }: { tour: Tour }) => {
               </li>
             )}
             {tour.price && (
-              <li>
-                <strong>{translations[activeLanguage].price}:</strong> {tour.price}
+              <li className='price-container'>
+                <strong>{translations[activeLanguage].price}:</strong>{' '}
+                {(() => {
+                  const [integer, decimal] = tour.price.split('.');
+                  return (
+                    <>
+                      <span className="price-integer">{integer}</span>
+                      {decimal && <span className="price-decimal">.{decimal}</span>}
+                    </>
+                  );
+                })()}
               </li>
             )}
           </ul>

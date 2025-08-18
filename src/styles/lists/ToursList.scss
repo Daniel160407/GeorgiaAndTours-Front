@@ -1,0 +1,62 @@
+$grid-gap: 2rem;
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+
+.tours-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $grid-gap;
+  padding: 2rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tour {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.5s ease forwards;
+      
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: $i * 0.1s;
+        }
+      }
+    }
+  }
+
+  @media (max-width: $tablet-breakpoint) {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $grid-gap * 0.75;
+    padding: 1.5rem;
+  }
+
+  @media (max-width: $mobile-breakpoint) {
+    grid-template-columns: 1fr;
+    gap: $grid-gap * 0.5;
+    padding: 1rem;
+  }
+
+  &:empty {
+    &::after {
+      content: "No tours available at the moment";
+      display: block;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.5);
+      padding: 3rem;
+      font-size: 1.2rem;
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

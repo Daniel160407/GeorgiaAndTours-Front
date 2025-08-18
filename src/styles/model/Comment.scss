@@ -1,0 +1,111 @@
+.comment {
+  $primary-color: #4a90e2;
+  $accent-color: #e74c3c;
+  $light-bg: #f9f9f9;
+  $border-color: #e0e0e0;
+  $text-color: #333;
+  $light-text: #777;
+  $border-radius: 10px;
+  $shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  $transition: all 0.3s ease;
+
+  position: relative;
+  padding: 1.8rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  transition: $transition;
+  border-left: 4px solid $primary-color;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+  }
+
+  h1 {
+    margin: 0 0 0.8rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $primary-color;
+    display: flex;
+    align-items: center;
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: $border-color;
+      margin-left: 1rem;
+    }
+  }
+
+  p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  p:nth-child(2) {
+    display: inline-block;
+    background: rgba($accent-color, 0.1);
+    color: $accent-color;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+
+    &::before {
+      content: '★';
+      margin-right: 0.3rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  p:nth-child(3) {
+    color: $light-text;
+    font-size: 0.85rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '📅';
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  p:nth-child(4) {
+    font-size: 1.05rem;
+    color: $text-color;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px dashed $border-color;
+    margin-top: 0.5rem;
+    line-height: 1.7;
+  }
+
+  &::before {
+    content: '"';
+    position: absolute;
+    top: 1.5rem;
+    right: 1.8rem;
+    font-size: 4rem;
+    color: rgba($primary-color, 0.08);
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.4rem;
+    
+    h1 {
+      font-size: 1.1rem;
+    }
+    
+    p:nth-child(4) {
+      font-size: 1rem;
+    }
+  }
+}

@@ -1,0 +1,130 @@
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2c3e50;
+$text-color: #333;
+$light-text: #fff;
+$border-radius: 30px;
+$transition-speed: 0.3s;
+$shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+$focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
+
+// Search Container
+.search {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0.5rem;
+
+  // Optional search icon
+  &::before {
+    content: "🔍";
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    z-index: 2;
+    transition: all $transition-speed ease;
+  }
+
+  // Optional clear button (X) when input has value
+  &::after {
+    content: "✕";
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+    transition: all $transition-speed ease;
+    color: lighten($text-color, 30%);
+    
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  // Show clear button when input has value
+  &.has-value::after {
+    opacity: 1;
+  }
+}
+
+// Search Box
+.search-box {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  font-size: 1rem;
+  border: 2px solid rgba($secondary-color, 0.1);
+  border-radius: $border-radius;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: $text-color;
+  transition: all $transition-speed ease;
+  box-shadow: $shadow;
+  outline: none;
+  appearance: none;
+  
+  &::placeholder {
+    color: lighten($text-color, 40%);
+    transition: color $transition-speed ease;
+  }
+
+  &:hover {
+    border-color: rgba($primary-color, 0.2);
+  }
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: $focus-shadow;
+    padding-left: 3.2rem;
+    
+    &::placeholder {
+      color: transparent;
+    }
+    
+    ~ .search::before {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .search {
+    max-width: 100%;
+    
+    &::before {
+      left: 1.2rem;
+    }
+    
+    &::after {
+      right: 1.2rem;
+    }
+  }
+  
+  .search-box {
+    padding: 0.8rem 0.8rem 0.8rem 2.8rem;
+    
+    &:focus {
+      padding-left: 3rem;
+    }
+  }
+}
+
+// Animation for search results (optional)
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// To use the has-value class, modify your component:
+// <div className={`search ${value ? 'has-value' : ''}`}>

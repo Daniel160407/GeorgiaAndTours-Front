@@ -1,5 +1,6 @@
 import type { Key } from 'react';
 import Tour from '../model/Tour';
+import '../../styles/lists/ToursList.scss';
 
 const ToursList = ({ tours, onTourClick }) => {
   return (

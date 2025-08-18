@@ -1,0 +1,234 @@
+.comment-form {
+  $primary-color: #4a90e2;
+  $accent-color: #e74c3c;
+  $light-bg: #f9f9f9;
+  $border-color: #e0e0e0;
+  $text-color: #333;
+  $light-text: #777;
+  $border-radius: 12px;
+  $shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+  $transition: all 0.3s ease;
+  $success-color: #2ecc71;
+
+  padding: 2.5rem;
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 2.5rem 0;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, $primary-color, $accent-color);
+  }
+
+  > div {
+    margin-bottom: 1.8rem;
+    position: relative;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+    color: $text-color;
+    font-size: 1.1rem;
+    padding-left: 0.5rem;
+    position: relative;
+
+    &::after {
+      content: '*';
+      color: $accent-color;
+      margin-left: 0.3rem;
+      position: absolute;
+      top: -0.1rem;
+    }
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+    border: 1px solid darken($light-bg, 8%);
+    border-radius: $border-radius;
+    font-size: 1.05rem;
+    transition: $transition;
+    background: $light-bg;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+      background: white;
+    }
+
+    &::placeholder {
+      color: lighten($light-text, 15%);
+    }
+  }
+
+  textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  .rating-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    input {
+      width: 80px;
+      text-align: center;
+    }
+
+    .stars {
+      display: flex;
+      gap: 0.5rem;
+
+      .star {
+        font-size: 1.8rem;
+        color: lighten($light-text, 20%);
+        cursor: pointer;
+        transition: $transition;
+        line-height: 1;
+
+        &:hover {
+          transform: scale(1.2);
+        }
+
+        &.active {
+          color: $accent-color;
+        }
+      }
+    }
+  }
+
+  button[type="submit"] {
+    background: $primary-color;
+    color: white;
+    border: none;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: $transition;
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 100%;
+      background: darken($primary-color, 8%);
+      transition: $transition;
+      z-index: -1;
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+
+      &::before {
+        width: 100%;
+      }
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  .form-title {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: $text-color;
+    font-size: 1.8rem;
+    position: relative;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, $primary-color, $accent-color);
+      border-radius: 2px;
+      margin: 0.8rem auto 0;
+    }
+  }
+
+  // Success message styling
+  .success-message {
+    background: rgba($success-color, 0.1);
+    color: darken($success-color, 20%);
+    padding: 1.2rem;
+    border-radius: $border-radius;
+    margin-top: 1.5rem;
+    text-align: center;
+    font-weight: 500;
+    border-left: 4px solid $success-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+
+    &::before {
+      content: '✓';
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 1.8rem;
+
+    .rating-container {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .stars {
+        .star {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.5rem 1.2rem;
+
+    label {
+      font-size: 1rem;
+    }
+
+    input, textarea {
+      padding: 0.9rem 1.2rem;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+    }
+  }
+}

@@ -1,3 +1,5 @@
+import '../../styles/uiComponents/LanguageSwitcher.scss';
+
 const LanguageSwitcher = ({ value, setValue }) => {
   const languages = [
     { code: "ENG", label: "ENG" },

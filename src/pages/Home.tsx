@@ -44,6 +44,10 @@ const Home = () => {
     setComments(response.data);
   }
 
+  const handleBackArrowClick = () => {
+    setShowExtendedTour(false);
+  }
+
   useEffect(() => {
     const fetchTours = async () => {
       try {
@@ -68,7 +72,7 @@ const Home = () => {
         <SortBySelector value={sortBy} setValue={setSortBy} />
         <ToursList tours={tours} onTourClick={handleTourClick} />
         {showExtendedTour && (
-          <ExtendedTour tour={selectedTour} comments={comments} onCommentSubmit={handleCommitSubmit} />
+          <ExtendedTour tour={selectedTour} comments={comments} onCommentSubmit={handleCommitSubmit} onBackArrowClick={handleBackArrowClick} />
         )}
       </div>
     </>

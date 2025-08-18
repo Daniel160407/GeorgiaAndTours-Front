@@ -1,3 +1,5 @@
+import '../../styles/uiComponents/Logo.scss';
+
 const Logo = () => {
     return (
         <div className="logo">

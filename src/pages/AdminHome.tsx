@@ -56,7 +56,6 @@ const AdminHome = () => {
       <Navbar adminMode={true} />
       <div className="admin-home">
         <Logo />
-        <Search value={searchValue} setValue={setSearchValue} onSubmit={handleSearch} />
         <LanguageSwitcher value={language} setValue={setLanguage} />
         <Slides />
         <SortBySelector value={sortBy} setValue={setSortBy} />

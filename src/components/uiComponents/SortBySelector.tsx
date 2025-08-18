@@ -1,4 +1,5 @@
 import React from 'react';
+import '../../styles/uiComponents/SortBySelector.scss';
 
 interface SortBySelectorProps {
   value: string;
@@ -7,7 +8,11 @@ interface SortBySelectorProps {
 
 const SortBySelector: React.FC<SortBySelectorProps> = ({ value, setValue }) => {
   return (
-    <select className="sort-by-selector" value={value} onChange={(e) => setValue(e.target.value)}>
+    <select 
+      className={'sort-by-selector'}
+      value={value} 
+      onChange={(e) => setValue(e.target.value)}
+    >
       <option value="name">Name</option>
       <option value="price">Price</option>
     </select>

@@ -1,4 +1,5 @@
 import React from "react";
+import '../../styles/uiComponents/Search.scss';
 
 interface SearchProps {
   value: string;
