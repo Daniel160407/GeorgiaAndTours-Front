@@ -4,6 +4,7 @@ import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import { ADMIN_ROLE, CLIENT_ROLE, SERVER_ROLE, USER_CREATION, WEBSOCKET_SID } from '../Constants';
 import '../styles/pages/ClientChat.scss';
+import Message from '../components/model/Message';
 
 interface Message {
   id?: number | string;
@@ -248,20 +249,7 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
           </div>
         ) : (
           messages.map((message) => (
-            <div
-              key={message.id || Math.random()}
-              className={`message ${message.sender === CLIENT_ROLE ? 'admin' : 'client'}`}
-            >
-              <div className="message-content">{message.payload}</div>
-              {message.date && (
-                <div className="message-timestamp">
-                  {new Date(message.date).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-              )}
-            </div>
+            <Message message={message} adminMode={false} />
           ))
         )}
         <div ref={messagesEndRef} />

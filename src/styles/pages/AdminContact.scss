@@ -13,6 +13,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   grid-template-columns: 320px 1fr;
   gap: 0;
   height: 100vh;
+  margin-top: 100px;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   font-family:
     'Inter',
@@ -30,14 +31,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-.header {
+.admin-chat-header {
   padding: 1.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background: white;
   backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
-  z-index: 10;
 }
 
 .chat-connection-status {

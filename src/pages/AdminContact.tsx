@@ -11,6 +11,8 @@ import {
   USER_CREATION,
 } from '../Constants';
 import '../styles/pages/AdminContact.scss';
+import Message from '../components/model/Message';
+import Navbar from '../components/navigation/Navbar';
 
 interface Message {
   id?: number | string;
@@ -52,6 +54,7 @@ const AdminContact = () => {
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
   const isInitialized = useRef(false);
   const selectedUserRef = useRef<User | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -106,6 +109,16 @@ const AdminContact = () => {
       }
     }, delay);
   }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
 
   const initializeWebSocket = useCallback(() => {
     if (wsManager.current) {
@@ -259,35 +272,22 @@ const AdminContact = () => {
   };
 
   return (
+    <>
+    <Navbar adminMode={true} />
     <div className="admin-contact">
       <UsersList users={users} setSelectedUser={setSelectedUser} />
       {selectedUser && (
         <div className="chat-container">
-          <div className="header">
+          <div className="admin-chat-header">
+            <div>{selectedUserRef.current?.name}</div>
             {(isDisconnected || loading) && (
               <div className="chat-connection-status">Connecting...</div>
             )}
           </div>
 
-          <div className="messages-container">
+          <div className="messages-container" ref={messagesContainerRef}>
             {messages.map((message) => (
-              <div
-                key={message.id || Math.random()}
-                className={`message ${message.sender === ADMIN_ROLE ? 'admin' : 'client'}`}
-              >
-                <div className="message-sender">
-                  {message.sender === CLIENT_ROLE ? `${selectedUserRef.current?.name}:` : ''}
-                </div>
-                <div className="message-content">{message.payload}</div>
-                {message.date && (
-                  <div className="message-timestamp">
-                    {new Date(message.date).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                )}
-              </div>
+              <Message message={message} adminMode={true} />
             ))}
             <div ref={messagesEndRef} />
           </div>
@@ -309,6 +309,7 @@ const AdminContact = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
