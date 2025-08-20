@@ -5,6 +5,8 @@ import TourEditForm from '../forms/TourEditForm';
 import Search from '../uiComponents/Search';
 import '../../styles/lists/AdminToursList.scss';
 import AdminTour from '../model/AdminTour';
+import SortBySelector from '../uiComponents/SortBySelector';
+import LanguageSwitcher from '../uiComponents/LanguageSwitcher';
 
 interface Tour {
   id: string;
@@ -26,7 +28,16 @@ interface AdminToursListProps {
   onNewTour: (tour: Tour) => void;
 }
 
-const AdminToursList = ({ tours, onEdit, onDelete, onNewTour }: AdminToursListProps) => {
+const AdminToursList = ({
+  tours,
+  onEdit,
+  onDelete,
+  onNewTour,
+  sortBy,
+  setSortBy,
+  language,
+  setLanguage,
+}: AdminToursListProps) => {
   const [showForm, setShowForm] = useState(false);
   const [editingTourId, setEditingTourId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,7 +81,11 @@ const AdminToursList = ({ tours, onEdit, onDelete, onNewTour }: AdminToursListPr
         />
       ) : (
         <>
-          <Search value={searchTerm} setValue={setSearchTerm} />
+          <div className="searchBar">
+            <SortBySelector value={sortBy} setValue={setSortBy} />
+            <Search value={searchTerm} setValue={setSearchTerm} />
+            <LanguageSwitcher value={language} setValue={setLanguage} />
+          </div>
           {filteredTours.length === 0 ? (
             <div className="empty-state">
               <h3>No Tours Found</h3>

@@ -1,3 +1,5 @@
+import '../../styles/model/User.scss';
+
 const User = ({ user, setSelectedUser }) => {
   return (
     <div className="user" onClick={() => setSelectedUser(user)}>

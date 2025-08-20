@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import { ADMIN_ROLE, CLIENT_ROLE, SERVER_ROLE, USER_CREATION, WEBSOCKET_SID } from '../Constants';
+import '../styles/pages/ClientChat.scss';
 
 interface Message {
   id?: number | string;
@@ -30,6 +31,12 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
   const wsManager = useRef<WebSocketManager | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isConnectingRef = useRef(false);
+  const formDataRef = useRef(formData);
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
 
   const handleServerMessages = useCallback((message: { payload: string; subject: string }) => {
     switch (message.subject) {
@@ -48,40 +55,25 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const sendSidWithUserData = (sid) => {
+  const sendSidWithUserData = useCallback((sid: string) => {
     const message = {
       senderEmail: Cookies.get('email'),
       sender: CLIENT_ROLE,
       subject: WEBSOCKET_SID,
       payload: sid,
     };
-    wsManager.current?.send(message);
-  };
+    wsManager.current?.send(JSON.stringify(message));
+  }, []);
 
-  const sendMessage = useCallback(() => {
+  const sendUserCreationMessage = useCallback(() => {
     const message = {
       sender: CLIENT_ROLE,
       subject: USER_CREATION,
-      payload: JSON.stringify(formData),
+      payload: JSON.stringify(formDataRef.current),
     };
-    wsManager.current?.send(message);
+    wsManager.current?.send(JSON.stringify(message));
     setShowForm(false);
-  }, [formData, setShowForm]);
-
-  const sendUserCreationMessage = useCallback(() => {
-    if (!wsManager.current?.isConnected()) {
-      const retry = () => {
-        if (wsManager.current?.isConnected()) {
-          sendMessage();
-        } else {
-          setTimeout(retry, 1000);
-        }
-      };
-      retry();
-    } else {
-      sendMessage();
-    }
-  }, [sendMessage]);
+  }, [setShowForm]);
 
   const retryConnection = useCallback(() => {
     if (retryTimeoutRef.current) {
@@ -129,7 +121,8 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
       isConnectingRef.current = false;
       setIsDisconnected(false);
       setLoading(false);
-      if (formData && Object.keys(formData).length > 0) {
+
+      if (formDataRef.current && Object.keys(formDataRef.current).length > 0) {
         sendUserCreationMessage();
       }
     };
@@ -161,29 +154,12 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
       wsManager.current?.removeConnectionListener('close', closeHandler);
       wsManager.current?.removeConnectionListener('error', errorHandler);
     };
-  }, [
-    formData,
-    handleAdminMessages,
-    handleServerMessages,
-    retryConnection,
-    sendUserCreationMessage,
-  ]);
+  }, [handleAdminMessages, handleServerMessages, retryConnection, sendUserCreationMessage]);
 
   useEffect(() => {
-    const newMessage: Message = {
-      senderEmail: userEmail,
-      receiverEmail: '',
-      sender: Cookies.get('username') || CLIENT_ROLE,
-      receiver: SERVER_ROLE,
-      payload: Cookies.get('sid'),
-    };
+    if (isInitialized.current) return;
+    isInitialized.current = true;
 
-    if (wsManager.current?.isConnected()) {
-      wsManager.current.send(JSON.stringify(newMessage));
-    }
-  }, [initializeWebSocket]);
-
-  useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await useAxios.get(`/messages?email=${userEmail}`);
@@ -209,22 +185,16 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+      if (wsManager.current) {
+        wsManager.current.disconnect();
+        wsManager.current = null;
+      }
     };
   }, [userEmail, initializeWebSocket]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
-
-  useEffect(() => {
-    if (formData && Object.keys(formData).length > 0) {
-      if (wsManager.current?.isConnected()) {
-        sendMessage();
-      } else {
-        initializeWebSocket();
-      }
-    }
-  }, [formData, initializeWebSocket, sendMessage]);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -254,30 +224,49 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
 
   return (
     <div className="client-chat">
-      <div className="header">
-        <p>Get a quick answer on any question</p>
-        {(isDisconnected || loading) && <div className="chat-connection-status">Connecting...</div>}
+      <div className="chat-header">
+        <div className="header-content">
+          <h3>Live Support Chat</h3>
+          <p>Get quick answers to your questions</p>
+        </div>
+        <div className="status-indicator">
+          {(isDisconnected || loading) && (
+            <div className="chat-connection-status">Connecting...</div>
+          )}
+          {!isDisconnected && !loading && (
+            <div className="connection-status connected">Connected</div>
+          )}
+        </div>
       </div>
+
       <div className="messages-container">
-        {messages.map((message) => (
-          <div
-            key={message.id || Math.random()}
-            className={`message ${message.sender === 'admin' ? 'admin' : 'client'}`}
-          >
-            <div className="message-sender">{message.sender}:</div>
-            <div className="message-content">{message.payload}</div>
-            {message.date && (
-              <div className="message-timestamp">
-                {new Date(message.date).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </div>
-            )}
+        {messages.length === 0 && !loading ? (
+          <div className="empty-state">
+            <div className="empty-icon">💬</div>
+            <h4>No messages yet</h4>
+            <p>Start a conversation by sending a message below</p>
           </div>
-        ))}
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id || Math.random()}
+              className={`message ${message.sender === CLIENT_ROLE ? 'admin' : 'client'}`}
+            >
+              <div className="message-content">{message.payload}</div>
+              {message.date && (
+                <div className="message-timestamp">
+                  {new Date(message.date).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+              )}
+            </div>
+          ))
+        )}
         <div ref={messagesEndRef} />
       </div>
+
       <div className="input-area">
         <textarea
           value={inputText}
@@ -286,7 +275,12 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
           placeholder="Type your question..."
           rows={1}
         />
-        <button onClick={handleSend} disabled={!inputText.trim()}>
+        <button
+          onClick={handleSend}
+          disabled={!inputText.trim()}
+          className="send-button"
+          aria-label="Send message"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>

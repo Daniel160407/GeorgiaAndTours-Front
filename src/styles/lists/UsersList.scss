@@ -1,0 +1,235 @@
+// Variables - Light Beautiful Theme
+$primary-color: #5b8cff;
+$primary-hover: #4a7dff;
+$bg-light: #f9fafb;
+$bg-lighter: #ffffff;
+$text-dark: #2d3748;
+$text-medium: #4a5568;
+$text-light: #718096;
+$border-color: #e2e8f0;
+$accent-color: #7e9af9;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Users list container
+.users-list {
+  height: 100vh;
+  overflow-y: auto;
+  background: $bg-lighter;
+  border-right: 1px solid $border-color;
+  box-shadow: $shadow;
+  display: flex;
+  flex-direction: column;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+}
+
+// User item
+.user-item {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+  background: $bg-lighter;
+  
+  &:hover {
+    background: lighten($bg-light, 1%);
+    transform: translateX(4px);
+  }
+  
+  &:active {
+    transform: translateX(2px);
+  }
+  
+  &.active {
+    background: rgba(91, 140, 255, 0.08);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: $primary-color;
+    }
+    
+    .user-name {
+      color: $primary-color;
+    }
+  }
+  
+  // User content wrapper
+  .user-content {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+  }
+  
+  // Avatar placeholder
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7e9af9 0%, #5b8cff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(91, 140, 255, 0.2);
+  }
+  
+  // User info
+  .user-info {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .user-name {
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    transition: $transition;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .user-email {
+    color: $text-medium;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  // Status indicator
+  .user-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #48bb78;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #48bb78;
+    flex-shrink: 0;
+    
+    &.offline {
+      background: #a0aec0;
+      box-shadow: 0 0 0 2px #a0aec0;
+    }
+    
+    &.away {
+      background: #ed8936;
+      box-shadow: 0 0 0 2px #ed8936;
+    }
+  }
+}
+
+// Empty state
+.users-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: $text-light;
+  
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+    color: $primary-color;
+  }
+  
+  .empty-text {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    color: $text-medium;
+  }
+  
+  .empty-subtext {
+    font-size: 0.875rem;
+  }
+}
+
+// Loading state
+.user-item-loading {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  
+  .loading-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #edf2f7;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .loading-info {
+    flex: 1;
+    
+    .loading-line {
+      height: 12px;
+      background: #edf2f7;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      animation: pulse 1.5s infinite;
+      
+      &:first-child {
+        width: 70%;
+      }
+      
+      &:last-child {
+        width: 90%;
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .users-list {
+    border-right: none;
+    border-bottom: 1px solid $border-color;
+    height: auto;
+    max-height: 40vh;
+  }
+  
+  .user-item {
+    padding: 1rem;
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+}

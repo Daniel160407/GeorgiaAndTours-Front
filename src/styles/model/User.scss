@@ -1,0 +1,182 @@
+$primary-color: #5b8cff;
+$primary-hover: #4a7dff;
+$bg-light: #f9fafb;
+$bg-lighter: #ffffff;
+$text-dark: #2d3748;
+$text-medium: #4a5568;
+$text-light: #718096;
+$border-color: #e2e8f0;
+$accent-color: #7e9af9;
+$shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+.user {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+  background: $bg-lighter;
+  
+  &:hover {
+    background: lighten($bg-light, 1%);
+    transform: translateX(4px);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid $primary-color;
+      border-bottom: 2px solid $primary-color;
+      transform: translateY(-50%) rotate(-45deg);
+      opacity: 0.7;
+    }
+  }
+  
+  &:active {
+    transform: translateX(2px);
+  }
+  
+  &.active {
+    background: rgba(91, 140, 255, 0.08);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: $primary-color;
+    }
+    
+    .user__name {
+      color: $primary-color;
+    }
+  }
+  
+  .user__name {
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 0.375rem;
+    font-size: 1rem;
+    transition: $transition;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    padding-left: 1.75rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #48bb78;
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px #48bb78;
+    }
+  }
+  
+  .user__email {
+    color: $text-medium;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: $transition;
+    padding-left: 1.75rem;
+  }
+  
+  &.offline {
+    .user__name::before {
+      background: #a0aec0;
+      box-shadow: 0 0 0 2px #a0aec0;
+    }
+  }
+  
+  &.away {
+    .user__name::before {
+      background: #ed8936;
+      box-shadow: 0 0 0 2px #ed8936;
+    }
+  }
+  
+  &.has-new-messages {
+    animation: newMessagePulse 2s ease-in-out;
+    
+    .user__name::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $primary-color;
+      animation: blink 2s infinite;
+    }
+  }
+}
+
+@keyframes newMessagePulse {
+  0% { background-color: $bg-lighter; }
+  25% { background-color: rgba(91, 140, 255, 0.1); }
+  50% { background-color: $bg-lighter; }
+  75% { background-color: rgba(91, 140, 255, 0.1); }
+  100% { background-color: $bg-lighter; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (max-width: 768px) {
+  .user {
+    padding: 1rem;
+    
+    .user__name,
+    .user__email {
+      padding-left: 1.5rem;
+    }
+    
+    .user__name::before {
+      width: 10px;
+      height: 10px;
+    }
+  }
+}
+
+.user:focus {
+  outline: 2px solid $primary-color;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+    
+    &.has-new-messages {
+      animation: none;
+      
+      .user__name::after {
+        animation: none;
+      }
+    }
+  }
+}

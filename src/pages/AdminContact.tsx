@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import UsersList from '../components/lists/UsersList';
@@ -10,6 +10,7 @@ import {
   SERVER_ROLE,
   USER_CREATION,
 } from '../Constants';
+import '../styles/pages/AdminContact.scss';
 
 interface Message {
   id?: number | string;
@@ -49,61 +50,19 @@ const AdminContact = () => {
   const wsManager = useRef<WebSocketManager | null>(null);
   const reconnectAttempts = useRef(0);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
+  const selectedUserRef = useRef<User | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-    initializeWebSocket();
-
-    return () => {
-      wsManager.current?.disconnect();
-      wsManager.current = null;
-
-      if (reconnectTimer.current) {
-        clearTimeout(reconnectTimer.current);
-        reconnectTimer.current = null;
-      }
-    };
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await useAxios.get('/user');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   }, []);
 
-  useEffect(() => {
-    const initialize = async () => {
-      await fetchUsers();
-      initializeWebSocket();
-    };
-    initialize();
-
-    return () => {
-      wsManager.current?.disconnect();
-      wsManager.current = null;
-
-      if (reconnectTimer.current) {
-        clearTimeout(reconnectTimer.current);
-        reconnectTimer.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (users.length > 0 && !selectedUser) {
-      setSelectedUser(users[0]);
-    }
-  }, [users]);
-
-  useEffect(() => {
-    if (selectedUser) {
-      fetchMessages();
-
-      if (wsManager.current?.isConnected()) {
-        wsManager.current.send({
-          sender: ADMIN_ROLE,
-          subject: SAVE_ADMIN_SID,
-          payload: '',
-        });
-      }
-    }
-  }, [selectedUser]);
-
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!selectedUser) return;
     try {
       const response = await useAxios.get(`/messages?email=${selectedUser.email}`);
@@ -118,9 +77,37 @@ const AdminContact = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedUser]);
 
-  const initializeWebSocket = () => {
+  const handleServerMessages = useCallback((message: ServerMessage) => {
+    switch (message.subject) {
+      case USER_CREATION:
+        setUsers(JSON.parse(message.payload));
+        break;
+      case SAVE_ADMIN_SID:
+        setSid(message.payload);
+        break;
+    }
+  }, []);
+
+  const retryConnection = useCallback(() => {
+    if (reconnectTimer.current) {
+      clearTimeout(reconnectTimer.current);
+    }
+
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+    reconnectAttempts.current++;
+
+    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
+
+    reconnectTimer.current = setTimeout(() => {
+      if (!wsManager.current?.isConnected?.()) {
+        initializeWebSocket();
+      }
+    }, delay);
+  }, []);
+
+  const initializeWebSocket = useCallback(() => {
     if (wsManager.current) {
       wsManager.current.disconnect();
       wsManager.current = null;
@@ -132,77 +119,117 @@ const AdminContact = () => {
     wsManager.current = new WebSocketManager('/socket');
     wsManager.current.connect();
 
-    wsManager.current.addMessageHandler((message: ServerMessage) => {
+    const messageHandler = (message: ServerMessage) => {
       try {
         switch (message.sender) {
           case SERVER_ROLE:
             handleServerMessages(message);
             break;
-          default:
-            if (selectedUser && message.senderEmail === selectedUser.email) {
-              setMessages((prev) => [...prev, message]);
+          default: {
+            const parsedMessage = JSON.parse(message.payload);
+            if (
+              selectedUserRef.current &&
+              parsedMessage.senderEmail === selectedUserRef.current.email
+            ) {
+              setMessages((prev) => [...prev, parsedMessage]);
             }
             fetchUsers();
             break;
+          }
         }
       } catch (err) {
         console.error('Error parsing incoming message:', err);
       }
-    });
+    };
 
-    wsManager.current.addConnectionListener('open', () => {
+    const openHandler = () => {
       console.log('Admin WebSocket connected');
       setIsDisconnected(false);
       setLoading(false);
-    });
+      reconnectAttempts.current = 0;
 
-    wsManager.current.addConnectionListener('close', () => {
+      if (selectedUserRef.current) {
+        wsManager.current?.send({
+          sender: ADMIN_ROLE,
+          subject: SAVE_ADMIN_SID,
+          payload: '',
+        });
+      }
+    };
+
+    const closeHandler = () => {
       console.warn('Admin WebSocket disconnected');
       setIsDisconnected(true);
       setLoading(false);
       retryConnection();
-    });
+    };
 
-    wsManager.current.addConnectionListener('error', (err: Event) => {
+    const errorHandler = (err: Event) => {
       console.error('Admin WebSocket error:', err);
       setIsDisconnected(true);
       setLoading(false);
       retryConnection();
-    });
-  };
+    };
 
-  const retryConnection = () => {
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-    reconnectAttempts.current++;
+    wsManager.current.addMessageHandler(messageHandler);
+    wsManager.current.addConnectionListener('open', openHandler);
+    wsManager.current.addConnectionListener('close', closeHandler);
+    wsManager.current.addConnectionListener('error', errorHandler);
 
-    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
+    return () => {
+      wsManager.current?.removeMessageHandler(messageHandler);
+      wsManager.current?.removeConnectionListener('open', openHandler);
+      wsManager.current?.removeConnectionListener('close', closeHandler);
+      wsManager.current?.removeConnectionListener('error', errorHandler);
+    };
+  }, [fetchUsers, handleServerMessages, retryConnection]);
 
-    reconnectTimer.current = setTimeout(() => {
-      if (!wsManager.current?.isConnected?.()) {
-        initializeWebSocket();
+  useEffect(() => {
+    selectedUserRef.current = selectedUser;
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
+    const initialize = async () => {
+      await fetchUsers();
+      initializeWebSocket();
+    };
+    initialize();
+
+    return () => {
+      if (reconnectTimer.current) {
+        clearTimeout(reconnectTimer.current);
+        reconnectTimer.current = null;
       }
-    }, delay);
-  };
+      if (wsManager.current) {
+        wsManager.current.disconnect();
+        wsManager.current = null;
+      }
+    };
+  }, [fetchUsers, initializeWebSocket]);
 
-  const handleServerMessages = (message: ServerMessage) => {
-    switch (message.subject) {
-      case USER_CREATION:
-        setUsers(JSON.parse(message.payload));
-        break;
-      case SAVE_ADMIN_SID:
-        setSid(message.payload);
-        break;
+  useEffect(() => {
+    if (users.length > 0 && !selectedUser) {
+      console.log(users[0]);
+      setSelectedUser(users[0]);
     }
-  };
+  }, [users, selectedUser]);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await useAxios.get('/user');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+  useEffect(() => {
+    if (selectedUser) {
+      fetchMessages();
+
+      if (wsManager.current?.isConnected()) {
+        wsManager.current.send({
+          sender: ADMIN_ROLE,
+          subject: SAVE_ADMIN_SID,
+          payload: '',
+        });
+      }
     }
-  };
+  }, [selectedUser, fetchMessages]);
 
   const handleSend = () => {
     if (inputText.trim() === '' || !selectedUser) return;
@@ -248,7 +275,9 @@ const AdminContact = () => {
                 key={message.id || Math.random()}
                 className={`message ${message.sender === ADMIN_ROLE ? 'admin' : 'client'}`}
               >
-                <div className="message-sender">{message.sender}:</div>
+                <div className="message-sender">
+                  {message.sender === CLIENT_ROLE ? `${selectedUserRef.current?.name}:` : ''}
+                </div>
                 <div className="message-content">{message.payload}</div>
                 {message.date && (
                   <div className="message-timestamp">

@@ -1,124 +1,80 @@
-// Variables
-$primary-color: #3498db;
-$secondary-color: #2c3e50;
-$light-bg: #f8f9fa;
-$border-color: rgba(0, 0, 0, 0.1);
-$transition-speed: 0.2s;
-
 .language-switcher {
   position: relative;
   display: inline-block;
-  min-width: 100px;
-  
-  // Custom dropdown arrow
+
   &::after {
-    content: "▼";
-    font-size: 0.6em;
+    content: '';
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: 1rem;
     transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.4rem solid #666;
     pointer-events: none;
-    color: $secondary-color;
-    transition: transform $transition-speed ease;
+    transition: transform 0.2s ease;
   }
 
   &:hover::after {
-    color: $primary-color;
+    transform: translateY(-50%) rotate(180deg);
   }
 
   select {
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100%;
-    padding: 0.5em 2em 0.5em 1em;
-    font-size: 0.9em;
+    background-color: transparent;
+    border: 1px solid #e1e1e1;
+    border-radius: 0.5rem;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    color: $secondary-color;
-    background-color: $light-bg;
-    border: 1px solid $border-color;
-    border-radius: 4px;
+    color: #333;
     cursor: pointer;
-    transition: all $transition-speed ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-    // Remove default arrow in IE
-    &::-ms-expand {
-      display: none;
-    }
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background-color: #fff;
 
     &:hover {
-      border-color: rgba($primary-color, 0.3);
-      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+      border-color: #b1b1b1;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     }
 
     &:focus {
       outline: none;
-      border-color: $primary-color;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
 
-      ~ .language-switcher::after {
-        transform: translateY(-50%) rotate(180deg);
+    option {
+      background-color: #fff;
+      color: #333;
+      padding: 0.5rem;
+      font-weight: normal;
+    }
+  }
+}
+
+[data-theme='dark'] {
+  .language-switcher {
+    &::after {
+      border-top-color: #ccc;
+    }
+
+    select {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        border-color: #718096;
+      }
+
+      option {
+        background-color: #2d3748;
+        color: #e2e8f0;
       }
     }
-  }
-
-  // Language option styling
-  option {
-    padding: 0.5em;
-    background: white;
-    color: $secondary-color;
-    
-    &:checked {
-      background-color: rgba($primary-color, 0.1);
-      font-weight: 600;
-    }
-  }
-}
-
-// Small size variant
-.language-switcher.small {
-  min-width: 80px;
-  
-  select {
-    padding: 0.3em 1.8em 0.3em 0.8em;
-    font-size: 0.8em;
-  }
-}
-
-// Minimal version (borderless)
-.language-switcher.minimal {
-  select {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding-right: 1.5em;
-    
-    &:hover, &:focus {
-      background: rgba(0, 0, 0, 0.02);
-    }
-  }
-  
-  &::after {
-    right: 5px;
-  }
-}
-
-// Dark theme variant
-.dark-mode .language-switcher {
-  select {
-    background-color: lighten($secondary-color, 10%);
-    color: white;
-    border-color: rgba(255, 255, 255, 0.1);
-    
-    option {
-      background: $secondary-color;
-      color: white;
-    }
-  }
-  
-  &::after {
-    color: rgba(255, 255, 255, 0.7);
   }
 }
