@@ -8,6 +8,7 @@ import SortBySelector from '../components/uiComponents/SortBySelector';
 import useAxios from '../hooks/UseAxios';
 import ExtendedTour from '../components/model/ExtendedTour';
 import '../styles/pages/Home.scss';
+import ChatHelper from '../components/uiComponents/ChatHelper';
 
 const Home = () => {
   const [searchValue, setSearchValue] = useState('');
@@ -80,6 +81,7 @@ const Home = () => {
             onBackArrowClick={handleBackArrowClick}
           />
         )}
+        <ChatHelper />
       </div>
     </>
   );
