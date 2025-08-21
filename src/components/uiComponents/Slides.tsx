@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "../../styles/uiComponents/Slides.scss";
 
 const images = [
-  { label: "Ready to explore new sites of Georgia?", image: "/images/Kazbegi.jpeg" },
+  { label: "Ready to explore the sights of Georgia?", image: "/images/Kazbegi.jpeg" },
   { label: "Discover the stunning Black Sea coast", image: "/images/Batumi.jpeg" },
   { label: "Walk the ancient streets of Tbilisi", image: "/images/Tbilisi.jpeg" },
   { label: "Explore the highest places in the Caucasus", image: "/images/Svaneti.jpeg" },

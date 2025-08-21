@@ -31,7 +31,6 @@ const CommentForm = ({ tourId, onSubmit }) => {
     setPayload("");
     setSubmitted(true);
     
-    // Reset success message after 3 seconds
     setTimeout(() => setSubmitted(false), 3000);
   };
 

@@ -8,26 +8,6 @@ import AdminTour from '../model/AdminTour';
 import SortBySelector from '../uiComponents/SortBySelector';
 import LanguageSwitcher from '../uiComponents/LanguageSwitcher';
 
-interface Tour {
-  id: string;
-  name: string;
-  direction: string;
-  duration: string;
-  price: string;
-  imageUrl: string;
-  description?: string;
-  requirements?: string;
-  language?: string;
-  status?: string;
-}
-
-interface AdminToursListProps {
-  tours: Tour[];
-  onEdit: (tour: Tour) => void;
-  onDelete: (id: string) => void;
-  onNewTour: (tour: Tour) => void;
-}
-
 const AdminToursList = ({
   tours,
   onEdit,

@@ -3,28 +3,7 @@ import CommentsList from '../lists/CommentsList';
 import CommentForm from '../forms/CommentForm';
 import '../../styles/model/ExtendedTour.scss';
 import BackBtn from '../uiComponents/BackBtn';
-
-interface Tour {
-  id: string;
-  imageUrl: string;
-  name: string;
-  description: string;
-  about?: string;
-  duration?: string;
-  price?: string;
-  direction?: string;
-}
-
-interface Translations {
-  [key: string]: {
-    descriptionTitle: string;
-    aboutTitle: string;
-    detailsTitle: string;
-    duration: string;
-    price: string;
-    direction: string;
-  };
-}
+import type { Tour, Translations } from '../../types/interfaces';
 
 type Language = 'ENG' | 'RUS';
 

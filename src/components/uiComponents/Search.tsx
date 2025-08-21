@@ -1,11 +1,6 @@
 import React from "react";
 import '../../styles/uiComponents/Search.scss';
-
-interface SearchProps {
-  value: string;
-  setValue: (value: string) => void;
-  onSubmit: () => void;
-}
+import type { SearchProps } from "../../types/interfaces";
 
 const Search: React.FC<SearchProps> = ({ value, setValue, onSubmit }) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

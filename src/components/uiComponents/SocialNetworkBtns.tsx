@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaFacebook, FaWhatsapp } from "react-icons/fa";
+import '../../styles/uiComponents/SocialNetworkBtns.scss';
 
 const SocialNetworkBtns = () => {
   const [showNumber, setShowNumber] = useState(false);

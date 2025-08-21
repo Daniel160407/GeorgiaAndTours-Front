@@ -5,25 +5,10 @@ import WebSocketManager from '../hooks/WebSocketManager';
 import { ADMIN_ROLE, CLIENT_ROLE, SERVER_ROLE, USER_CREATION, WEBSOCKET_SID } from '../Constants';
 import '../styles/pages/ClientChat.scss';
 import Message from '../components/model/Message';
-
-interface Message {
-  id?: number | string;
-  senderEmail: string;
-  receiverEmail: string;
-  sender: string;
-  receiver: string;
-  payload: string;
-  date?: string;
-}
-
-interface ClientChatProps {
-  userEmail: string;
-  formData: any;
-  setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
-}
+import type { ClientChatProps, MessageObj } from '../types/interfaces';
 
 const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowForm }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageObj[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isDisconnected, setIsDisconnected] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -166,7 +151,7 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
         const response = await useAxios.get(`/messages?email=${userEmail}`);
         setMessages(
           response.data.sort(
-            (a: Message, b: Message) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+            (a: MessageObj, b: MessageObj) => new Date(a.date).getTime() - new Date(b.date).getTime(),
           ),
         );
       } catch (error) {
@@ -200,7 +185,7 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
   const handleSend = () => {
     if (!inputText.trim()) return;
 
-    const newMessage: Message = {
+    const newMessage: MessageObj = {
       senderEmail: userEmail,
       receiverEmail: '',
       sender: Cookies.get('username') || CLIENT_ROLE,

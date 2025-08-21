@@ -1,4 +1,3 @@
-// Variables
 $primary-color: #3498db;
 $secondary-color: #2c3e50;
 $text-color: #333;
@@ -8,7 +7,6 @@ $transition-speed: 0.3s;
 $shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
 $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
 
-// Search Container
 .search {
   position: relative;
   width: 100%;
@@ -16,7 +14,6 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
   margin: 0 auto;
   padding: 0.5rem;
 
-  // Optional search icon
   &::before {
     content: "🔍";
     position: absolute;
@@ -26,9 +23,9 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
     opacity: 0.6;
     z-index: 2;
     transition: all $transition-speed ease;
+    font-size: 1.1rem;
   }
 
-  // Optional clear button (X) when input has value
   &::after {
     content: "✕";
     position: absolute;
@@ -40,19 +37,79 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
     z-index: 2;
     transition: all $transition-speed ease;
     color: lighten($text-color, 30%);
+    font-size: 1.1rem;
     
     &:hover {
       color: $primary-color;
     }
   }
 
-  // Show clear button when input has value
   &.has-value::after {
     opacity: 1;
   }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0.4rem;
+    
+    &::before {
+      left: 1.2rem;
+      font-size: 1rem;
+    }
+    
+    &::after {
+      right: 1.2rem;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.3rem;
+    
+    &::before {
+      left: 1rem;
+      font-size: 0.95rem;
+    }
+    
+    &::after {
+      right: 1rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 375px) {
+    &::before {
+      left: 0.875rem;
+      font-size: 0.9rem;
+    }
+    
+    &::after {
+      right: 0.875rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    &::before {
+      left: 1rem;
+    }
+    
+    &::after {
+      right: 1rem;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    &::after {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
-// Search Box
 .search-box {
   width: 100%;
   padding: 1rem 1rem 1rem 3rem;
@@ -69,6 +126,7 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
   &::placeholder {
     color: lighten($text-color, 40%);
     transition: color $transition-speed ease;
+    font-size: 0.95rem;
   }
 
   &:hover {
@@ -89,32 +147,78 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
       transform: translateY(-50%) scale(1.1);
     }
   }
-}
 
-// Responsive Design
-@media (max-width: 768px) {
-  .search {
-    max-width: 100%;
-    
-    &::before {
-      left: 1.2rem;
-    }
-    
-    &::after {
-      right: 1.2rem;
-    }
-  }
-  
-  .search-box {
-    padding: 0.8rem 0.8rem 0.8rem 2.8rem;
+  @media (max-width: 768px) {
+    padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+    font-size: 0.95rem;
     
     &:focus {
       padding-left: 3rem;
     }
+    
+    &::placeholder {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem 0.8rem 0.8rem 2.6rem;
+    font-size: 0.9rem;
+    border-radius: 25px;
+    
+    &:focus {
+      padding-left: 2.8rem;
+    }
+    
+    &::placeholder {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 375px) {
+    padding: 0.75rem 0.75rem 0.75rem 2.4rem;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    
+    &:focus {
+      padding-left: 2.6rem;
+    }
+    
+    &::placeholder {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    padding: 0.6rem 0.8rem 0.6rem 2.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    ~ .search::before,
+    ~ .search::after {
+      transition: none;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    border: 2px solid #000;
+    background-color: #fff;
+    
+    &:focus {
+      outline: 2px solid #000;
+      outline-offset: 2px;
+    }
   }
 }
 
-// Animation for search results (optional)
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -126,5 +230,13 @@ $focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
   }
 }
 
-// To use the has-value class, modify your component:
-// <div className={`search ${value ? 'has-value' : ''}`}>
+@media (prefers-reduced-motion: reduce) {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

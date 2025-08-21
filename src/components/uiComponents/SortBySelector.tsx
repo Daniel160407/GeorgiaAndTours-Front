@@ -1,10 +1,6 @@
 import React from 'react';
 import '../../styles/uiComponents/SortBySelector.scss';
-
-interface SortBySelectorProps {
-  value: string;
-  setValue: (value: string) => void;
-}
+import type { SortBySelectorProps } from '../../types/interfaces';
 
 const SortBySelector: React.FC<SortBySelectorProps> = ({ value, setValue }) => {
   return (

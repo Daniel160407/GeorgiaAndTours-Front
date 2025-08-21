@@ -13,36 +13,12 @@ import {
 import '../styles/pages/AdminContact.scss';
 import Message from '../components/model/Message';
 import Navbar from '../components/navigation/Navbar';
-
-interface Message {
-  id?: number | string;
-  senderEmail: string;
-  receiverEmail: string;
-  sender: string;
-  receiver: string;
-  subject?: string;
-  payload: string;
-  date?: string;
-}
-
-interface ServerMessage {
-  senderEmail: string;
-  sender: string;
-  receiver?: string;
-  subject?: string;
-  payload: string;
-}
-
-interface User {
-  id?: number | string;
-  email: string;
-  name?: string;
-}
+import type { MessageObj, ServerMessage, User } from '../types/interfaces';
 
 const AdminContact = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageObj[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isDisconnected, setIsDisconnected] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -71,7 +47,7 @@ const AdminContact = () => {
       const response = await useAxios.get(`/messages?email=${selectedUser.email}`);
       setMessages(
         response.data.sort(
-          (a: Message, b: Message) =>
+          (a: MessageObj, b: MessageObj) =>
             new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
         ),
       );
@@ -247,7 +223,7 @@ const AdminContact = () => {
   const handleSend = () => {
     if (inputText.trim() === '' || !selectedUser) return;
 
-    const newMessage: Message = {
+    const newMessage: MessageObj = {
       senderEmail: '',
       receiverEmail: selectedUser.email,
       sender: ADMIN_ROLE,
@@ -273,42 +249,42 @@ const AdminContact = () => {
 
   return (
     <>
-    <Navbar adminMode={true} />
-    <div className="admin-contact">
-      <UsersList users={users} setSelectedUser={setSelectedUser} />
-      {selectedUser && (
-        <div className="chat-container">
-          <div className="admin-chat-header">
-            <div>{selectedUserRef.current?.name}</div>
-            {(isDisconnected || loading) && (
-              <div className="chat-connection-status">Connecting...</div>
-            )}
-          </div>
+      <Navbar adminMode={true} />
+      <div className="admin-contact">
+        <UsersList users={users} setSelectedUser={setSelectedUser} />
+        {selectedUser && (
+          <div className="chat-container">
+            <div className="admin-chat-header">
+              <div>{selectedUserRef.current?.name}</div>
+              {(isDisconnected || loading) && (
+                <div className="chat-connection-status">Connecting...</div>
+              )}
+            </div>
 
-          <div className="messages-container" ref={messagesContainerRef}>
-            {messages.map((message) => (
-              <Message message={message} adminMode={true} />
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+            <div className="messages-container" ref={messagesContainerRef}>
+              {messages.map((message) => (
+                <Message message={message} adminMode={true} />
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
 
-          <div className="input-area">
-            <textarea
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              rows={1}
-            />
-            <button onClick={handleSend} disabled={!inputText.trim() || !selectedUser}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-              </svg>
-            </button>
+            <div className="input-area">
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                rows={1}
+              />
+              <button onClick={handleSend} disabled={!inputText.trim() || !selectedUser}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 };
