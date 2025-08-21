@@ -4,6 +4,7 @@ import UserForm from '../components/forms/UserForm';
 import SocialNetworkBtns from '../components/uiComponents/SocialNetworkBtns';
 import ClientChat from './ClientChat';
 import Navbar from '../components/navigation/Navbar';
+import '../styles/pages/Contact.scss';
 
 const Contact = () => {
   const [showForm, setShowForm] = useState(true);

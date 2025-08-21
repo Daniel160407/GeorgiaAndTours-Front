@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import UsersList from '../components/lists/UsersList';
@@ -10,36 +10,15 @@ import {
   SERVER_ROLE,
   USER_CREATION,
 } from '../Constants';
-
-interface Message {
-  id?: number | string;
-  senderEmail: string;
-  receiverEmail: string;
-  sender: string;
-  receiver: string;
-  subject?: string;
-  payload: string;
-  date?: string;
-}
-
-interface ServerMessage {
-  senderEmail: string;
-  sender: string;
-  receiver?: string;
-  subject?: string;
-  payload: string;
-}
-
-interface User {
-  id?: number | string;
-  email: string;
-  name?: string;
-}
+import '../styles/pages/AdminContact.scss';
+import Message from '../components/model/Message';
+import Navbar from '../components/navigation/Navbar';
+import type { MessageObj, ServerMessage, User } from '../types/interfaces';
 
 const AdminContact = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageObj[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isDisconnected, setIsDisconnected] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,23 +28,159 @@ const AdminContact = () => {
   const wsManager = useRef<WebSocketManager | null>(null);
   const reconnectAttempts = useRef(0);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
+  const selectedUserRef = useRef<User | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-    initializeWebSocket();
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await useAxios.get('/user');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }, []);
 
-    return () => {
-      wsManager.current?.disconnect();
-      wsManager.current = null;
+  const fetchMessages = useCallback(async () => {
+    if (!selectedUser) return;
+    try {
+      const response = await useAxios.get(`/messages?email=${selectedUser.email}`);
+      setMessages(
+        response.data.sort(
+          (a: MessageObj, b: MessageObj) =>
+            new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
+        ),
+      );
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedUser]);
 
-      if (reconnectTimer.current) {
-        clearTimeout(reconnectTimer.current);
-        reconnectTimer.current = null;
+  const handleServerMessages = useCallback((message: ServerMessage) => {
+    switch (message.subject) {
+      case USER_CREATION:
+        setUsers(JSON.parse(message.payload));
+        break;
+      case SAVE_ADMIN_SID:
+        setSid(message.payload);
+        break;
+    }
+  }, []);
+
+  const retryConnection = useCallback(() => {
+    if (reconnectTimer.current) {
+      clearTimeout(reconnectTimer.current);
+    }
+
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+    reconnectAttempts.current++;
+
+    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
+
+    reconnectTimer.current = setTimeout(() => {
+      if (!wsManager.current?.isConnected?.()) {
+        initializeWebSocket();
       }
-    };
+    }, delay);
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, []);
 
   useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  const initializeWebSocket = useCallback(() => {
+    if (wsManager.current) {
+      wsManager.current.disconnect();
+      wsManager.current = null;
+    }
+
+    setIsDisconnected(false);
+    setLoading(true);
+
+    wsManager.current = new WebSocketManager('/socket');
+    wsManager.current.connect();
+
+    const messageHandler = (message: ServerMessage) => {
+      try {
+        switch (message.sender) {
+          case SERVER_ROLE:
+            handleServerMessages(message);
+            break;
+          default: {
+            const parsedMessage = JSON.parse(message.payload);
+            if (
+              selectedUserRef.current &&
+              parsedMessage.senderEmail === selectedUserRef.current.email
+            ) {
+              setMessages((prev) => [...prev, parsedMessage]);
+            }
+            fetchUsers();
+            break;
+          }
+        }
+      } catch (err) {
+        console.error('Error parsing incoming message:', err);
+      }
+    };
+
+    const openHandler = () => {
+      console.log('Admin WebSocket connected');
+      setIsDisconnected(false);
+      setLoading(false);
+      reconnectAttempts.current = 0;
+
+      if (selectedUserRef.current) {
+        wsManager.current?.send({
+          sender: ADMIN_ROLE,
+          subject: SAVE_ADMIN_SID,
+          payload: '',
+        });
+      }
+    };
+
+    const closeHandler = () => {
+      console.warn('Admin WebSocket disconnected');
+      setIsDisconnected(true);
+      setLoading(false);
+      retryConnection();
+    };
+
+    const errorHandler = (err: Event) => {
+      console.error('Admin WebSocket error:', err);
+      setIsDisconnected(true);
+      setLoading(false);
+      retryConnection();
+    };
+
+    wsManager.current.addMessageHandler(messageHandler);
+    wsManager.current.addConnectionListener('open', openHandler);
+    wsManager.current.addConnectionListener('close', closeHandler);
+    wsManager.current.addConnectionListener('error', errorHandler);
+
+    return () => {
+      wsManager.current?.removeMessageHandler(messageHandler);
+      wsManager.current?.removeConnectionListener('open', openHandler);
+      wsManager.current?.removeConnectionListener('close', closeHandler);
+      wsManager.current?.removeConnectionListener('error', errorHandler);
+    };
+  }, [fetchUsers, handleServerMessages, retryConnection]);
+
+  useEffect(() => {
+    selectedUserRef.current = selectedUser;
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     const initialize = async () => {
       await fetchUsers();
       initializeWebSocket();
@@ -73,21 +188,23 @@ const AdminContact = () => {
     initialize();
 
     return () => {
-      wsManager.current?.disconnect();
-      wsManager.current = null;
-
       if (reconnectTimer.current) {
         clearTimeout(reconnectTimer.current);
         reconnectTimer.current = null;
       }
+      if (wsManager.current) {
+        wsManager.current.disconnect();
+        wsManager.current = null;
+      }
     };
-  }, []);
+  }, [fetchUsers, initializeWebSocket]);
 
   useEffect(() => {
     if (users.length > 0 && !selectedUser) {
+      console.log(users[0]);
       setSelectedUser(users[0]);
     }
-  }, [users]);
+  }, [users, selectedUser]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -101,113 +218,12 @@ const AdminContact = () => {
         });
       }
     }
-  }, [selectedUser]);
-
-  const fetchMessages = async () => {
-    if (!selectedUser) return;
-    try {
-      const response = await useAxios.get(`/messages?email=${selectedUser.email}`);
-      setMessages(
-        response.data.sort(
-          (a: Message, b: Message) =>
-            new Date(a.date || '').getTime() - new Date(b.date || '').getTime(),
-        ),
-      );
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const initializeWebSocket = () => {
-    if (wsManager.current) {
-      wsManager.current.disconnect();
-      wsManager.current = null;
-    }
-
-    setIsDisconnected(false);
-    setLoading(true);
-
-    wsManager.current = new WebSocketManager('/socket');
-    wsManager.current.connect();
-
-    wsManager.current.addMessageHandler((message: ServerMessage) => {
-      try {
-        switch (message.sender) {
-          case SERVER_ROLE:
-            handleServerMessages(message);
-            break;
-          default:
-            if (selectedUser && message.senderEmail === selectedUser.email) {
-              setMessages((prev) => [...prev, message]);
-            }
-            fetchUsers();
-            break;
-        }
-      } catch (err) {
-        console.error('Error parsing incoming message:', err);
-      }
-    });
-
-    wsManager.current.addConnectionListener('open', () => {
-      console.log('Admin WebSocket connected');
-      setIsDisconnected(false);
-      setLoading(false);
-    });
-
-    wsManager.current.addConnectionListener('close', () => {
-      console.warn('Admin WebSocket disconnected');
-      setIsDisconnected(true);
-      setLoading(false);
-      retryConnection();
-    });
-
-    wsManager.current.addConnectionListener('error', (err: Event) => {
-      console.error('Admin WebSocket error:', err);
-      setIsDisconnected(true);
-      setLoading(false);
-      retryConnection();
-    });
-  };
-
-  const retryConnection = () => {
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-    reconnectAttempts.current++;
-
-    console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current})`);
-
-    reconnectTimer.current = setTimeout(() => {
-      if (!wsManager.current?.isConnected?.()) {
-        initializeWebSocket();
-      }
-    }, delay);
-  };
-
-  const handleServerMessages = (message: ServerMessage) => {
-    switch (message.subject) {
-      case USER_CREATION:
-        setUsers(JSON.parse(message.payload));
-        break;
-      case SAVE_ADMIN_SID:
-        setSid(message.payload);
-        break;
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const response = await useAxios.get('/user');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+  }, [selectedUser, fetchMessages]);
 
   const handleSend = () => {
     if (inputText.trim() === '' || !selectedUser) return;
 
-    const newMessage: Message = {
+    const newMessage: MessageObj = {
       senderEmail: '',
       receiverEmail: selectedUser.email,
       sender: ADMIN_ROLE,
@@ -232,54 +248,44 @@ const AdminContact = () => {
   };
 
   return (
-    <div className="admin-contact">
-      <UsersList users={users} setSelectedUser={setSelectedUser} />
-      {selectedUser && (
-        <div className="chat-container">
-          <div className="header">
-            {(isDisconnected || loading) && (
-              <div className="chat-connection-status">Connecting...</div>
-            )}
-          </div>
+    <>
+      <Navbar adminMode={true} />
+      <div className="admin-contact">
+        <UsersList users={users} setSelectedUser={setSelectedUser} />
+        {selectedUser && (
+          <div className="chat-container">
+            <div className="admin-chat-header">
+              <div>{selectedUserRef.current?.name}</div>
+              {(isDisconnected || loading) && (
+                <div className="chat-connection-status">Connecting...</div>
+              )}
+            </div>
 
-          <div className="messages-container">
-            {messages.map((message) => (
-              <div
-                key={message.id || Math.random()}
-                className={`message ${message.sender === ADMIN_ROLE ? 'admin' : 'client'}`}
-              >
-                <div className="message-sender">{message.sender}:</div>
-                <div className="message-content">{message.payload}</div>
-                {message.date && (
-                  <div className="message-timestamp">
-                    {new Date(message.date).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+            <div className="messages-container" ref={messagesContainerRef}>
+              {messages.map((message) => (
+                <Message message={message} adminMode={true} />
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
 
-          <div className="input-area">
-            <textarea
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              rows={1}
-            />
-            <button onClick={handleSend} disabled={!inputText.trim() || !selectedUser}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-              </svg>
-            </button>
+            <div className="input-area">
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                rows={1}
+              />
+              <button onClick={handleSend} disabled={!inputText.trim() || !selectedUser}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 

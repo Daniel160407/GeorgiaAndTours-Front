@@ -1,8 +1,36 @@
+import { useState } from 'react';
+import '../../styles/model/Tour.scss';
+
 const Tour = ({ tour, onClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const getBadgeText = () => {
+    if (tour.price && parseFloat(tour.price.replace('$', '')) < 10) {
+      return 'Budget';
+    }
+    if (tour.duration && (tour.duration.includes('hour') || tour.duration.includes('час')) && parseInt(tour.duration) > 1) {
+      return 'Extended';
+    }
+    return 'Popular';
+  };
+
   return (
-    <div className="tour" onClick={() => onClick(tour)}>
+    <div 
+      className="tour" 
+      onClick={() => onClick(tour)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="image-container">
-        <img src={tour.imageUrl} />
+        <img 
+          src={tour.imageUrl} 
+          alt={tour.name}
+          loading="lazy"
+        />
+        <div className="tour-badge">{getBadgeText()}</div>
+        {isHovered && (
+          <button className="cta-button">View Details</button>
+        )}
       </div>
       <div className="tour-info">
         <h1 className="tour-title">{tour.name}</h1>

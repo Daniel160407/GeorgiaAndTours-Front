@@ -1,5 +1,6 @@
 import type { Key } from "react";
 import User from "../model/User";
+import '../../styles/lists/UsersList.scss';
 
 const UsersList = ({ users, setSelectedUser }) => {
     return (

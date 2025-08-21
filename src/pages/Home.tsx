@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import Search from '../components/uiComponents/Search';
-import Logo from '../components/uiComponents/Logo';
 import Slides from '../components/uiComponents/Slides';
 import Navbar from '../components/navigation/Navbar';
 import LanguageSwitcher from '../components/uiComponents/LanguageSwitcher';
@@ -8,6 +7,7 @@ import ToursList from '../components/lists/ToursList';
 import SortBySelector from '../components/uiComponents/SortBySelector';
 import useAxios from '../hooks/UseAxios';
 import ExtendedTour from '../components/model/ExtendedTour';
+import '../styles/pages/Home.scss';
 
 const Home = () => {
   const [searchValue, setSearchValue] = useState('');
@@ -34,15 +34,19 @@ const Home = () => {
     const fetchComments = async () => {
       const response = await useAxios.get(`/comments/${tour.id}`);
       setComments(response.data);
-    }
+    };
 
     fetchComments();
-  }
+  };
 
   const handleCommitSubmit = async (formData: unknown) => {
     const response = await useAxios.post(`/comments`, formData);
     setComments(response.data);
-  }
+  };
+
+  const handleBackArrowClick = () => {
+    setShowExtendedTour(false);
+  };
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -61,14 +65,20 @@ const Home = () => {
     <>
       <Navbar adminMode={false} />
       <div className="home">
-        <Logo />
-        <Search value={searchValue} setValue={setSearchValue} onSubmit={handleSearch} />
-        <LanguageSwitcher value={language} setValue={setLanguage} />
         <Slides />
-        <SortBySelector value={sortBy} setValue={setSortBy} />
+        <div className="searchBar">
+          <SortBySelector value={sortBy} setValue={setSortBy} />
+          <Search value={searchValue} setValue={setSearchValue} onSubmit={handleSearch} />
+          <LanguageSwitcher value={language} setValue={setLanguage} />
+        </div>
         <ToursList tours={tours} onTourClick={handleTourClick} />
         {showExtendedTour && (
-          <ExtendedTour tour={selectedTour} comments={comments} onCommentSubmit={handleCommitSubmit} />
+          <ExtendedTour
+            tour={selectedTour}
+            comments={comments}
+            onCommentSubmit={handleCommitSubmit}
+            onBackArrowClick={handleBackArrowClick}
+          />
         )}
       </div>
     </>

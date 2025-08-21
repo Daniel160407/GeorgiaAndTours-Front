@@ -1,3 +1,5 @@
+import '../../styles/uiComponents/AddTourBtn.scss';
+
 const AddTourBtn = ({ onClick }) => {
     return (
         <div className="add-tour-btn" onClick={onClick}>

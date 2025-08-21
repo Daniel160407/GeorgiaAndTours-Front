@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import '../../styles/forms/TourEditForm.scss';
 
-const AdminTourEditForm = ({ tour, onSubmit, onCancel }) => {
+const TourEditForm = ({ tour, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     id: tour.id,
     imageUrl: tour.imageUrl || '',
@@ -124,4 +125,4 @@ const AdminTourEditForm = ({ tour, onSubmit, onCancel }) => {
   );
 };
 
-export default AdminTourEditForm;
+export default TourEditForm;

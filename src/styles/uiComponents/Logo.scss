@@ -1,0 +1,92 @@
+// Variables
+$primary-color: #2c3e50;       // Dark blue-gray
+$secondary-color: #e74c3c;     // Warm accent color
+$font-stack: 'Playfair Display', serif; // Elegant serif font
+$transition-speed: 0.3s;
+
+.logo {
+  display: inline-block;
+  position: relative;
+  padding: 0.5rem 0;
+  cursor: default;
+  user-select: none;
+
+  h1 {
+    font-family: $font-stack;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: $primary-color;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    position: relative;
+    display: inline-block;
+    transition: all $transition-speed ease;
+
+    &::before {
+      position: absolute;
+      top: -0.4em;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.5em;
+      color: $secondary-color;
+      opacity: 0.8;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    span:first-child {
+      position: relative;
+      padding-right: 1.2rem;
+    }
+
+    span:last-child {
+      position: relative;
+      padding-left: 1.2rem;
+      font-weight: 300;
+    }
+  }
+
+  &:hover h1 {
+    color: darken($primary-color, 10%);
+    
+    &::before {
+      transform: translateX(-50%) rotate(5deg);
+      opacity: 1;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $secondary-color, transparent);
+    opacity: 0.5;
+    transition: opacity $transition-speed ease;
+  }
+
+  &:hover::after {
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo h1 {
+    font-size: 1.8rem;
+    
+    &::before {
+      top: -0.3em;
+      font-size: 1.3em;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .logo h1 {
+    font-size: 1.5rem;
+    letter-spacing: -0.3px;
+  }
+}

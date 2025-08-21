@@ -1,0 +1,123 @@
+// TourEditForm.scss
+.admin-tour-form {
+  // Center the form on the screen
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  
+  // Form styling
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 500px;
+  // backdrop-filter: blur(10px); // Commented out to test if this causes flickering; re-enable if needed
+  
+  // Optimize rendering
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  backface-visibility: hidden;
+  
+  // Responsive adjustments
+  @media (max-width: 600px) {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      background: #f9f9f9;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: #4a90e2;
+        background: #fff;
+        box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+      }
+
+      &::placeholder {
+        color: #aaa;
+        font-style: italic;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      will-change: background-color;
+      -webkit-backface-visibility: hidden;
+      -moz-backface-visibility: hidden;
+      backface-visibility: hidden;
+
+      // Submit button
+      &:first-child {
+        background: #4a90e2;
+        color: #fff;
+
+        &:hover {
+          background: #357abd;
+        }
+      }
+
+      // Cancel button
+      &:last-child {
+        background: #f0f0f0;
+        color: #333;
+
+        &:hover {
+          background: #e0e0e0;
+        }
+      }
+    }
+  }
+}
+
+// Background overlay
+body:has(.admin-tour-form) {
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+    pointer-events: none; // Prevents interference with hover events
+  }
+}

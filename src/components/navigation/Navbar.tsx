@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
+import '../../styles/navigation/Navbar.scss';
+import Logo from '../uiComponents/Logo';
 
 const Navbar = ({ adminMode }) => {
   const location = useLocation();
@@ -29,6 +31,7 @@ const Navbar = ({ adminMode }) => {
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
+        <Logo />
         <nav className="desktop-nav">
           <ul>
             {filteredItems.map(({ label, path }) => (

@@ -1,0 +1,242 @@
+$primary-color: #3498db;
+$secondary-color: #2c3e50;
+$text-color: #333;
+$light-text: #fff;
+$border-radius: 30px;
+$transition-speed: 0.3s;
+$shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+$focus-shadow: 0 2px 20px rgba($primary-color, 0.2);
+
+.search {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0.5rem;
+
+  &::before {
+    content: "🔍";
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    z-index: 2;
+    transition: all $transition-speed ease;
+    font-size: 1.1rem;
+  }
+
+  &::after {
+    content: "✕";
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+    transition: all $transition-speed ease;
+    color: lighten($text-color, 30%);
+    font-size: 1.1rem;
+    
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+  &.has-value::after {
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0.4rem;
+    
+    &::before {
+      left: 1.2rem;
+      font-size: 1rem;
+    }
+    
+    &::after {
+      right: 1.2rem;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.3rem;
+    
+    &::before {
+      left: 1rem;
+      font-size: 0.95rem;
+    }
+    
+    &::after {
+      right: 1rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 375px) {
+    &::before {
+      left: 0.875rem;
+      font-size: 0.9rem;
+    }
+    
+    &::after {
+      right: 0.875rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    &::before {
+      left: 1rem;
+    }
+    
+    &::after {
+      right: 1rem;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    &::after {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.search-box {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  font-size: 1rem;
+  border: 2px solid rgba($secondary-color, 0.1);
+  border-radius: $border-radius;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: $text-color;
+  transition: all $transition-speed ease;
+  box-shadow: $shadow;
+  outline: none;
+  appearance: none;
+  
+  &::placeholder {
+    color: lighten($text-color, 40%);
+    transition: color $transition-speed ease;
+    font-size: 0.95rem;
+  }
+
+  &:hover {
+    border-color: rgba($primary-color, 0.2);
+  }
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: $focus-shadow;
+    padding-left: 3.2rem;
+    
+    &::placeholder {
+      color: transparent;
+    }
+    
+    ~ .search::before {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+    font-size: 0.95rem;
+    
+    &:focus {
+      padding-left: 3rem;
+    }
+    
+    &::placeholder {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem 0.8rem 0.8rem 2.6rem;
+    font-size: 0.9rem;
+    border-radius: 25px;
+    
+    &:focus {
+      padding-left: 2.8rem;
+    }
+    
+    &::placeholder {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 375px) {
+    padding: 0.75rem 0.75rem 0.75rem 2.4rem;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    
+    &:focus {
+      padding-left: 2.6rem;
+    }
+    
+    &::placeholder {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-height: 500px) and (orientation: landscape) {
+    padding: 0.6rem 0.8rem 0.6rem 2.6rem;
+    font-size: 0.9rem;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    ~ .search::before,
+    ~ .search::after {
+      transition: none;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    border: 2px solid #000;
+    background-color: #fff;
+    
+    &:focus {
+      outline: 2px solid #000;
+      outline-offset: 2px;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

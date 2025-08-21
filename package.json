@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build --dotenv .env.development",
-    "build_prod": "tsc -b && vite build --mode production",
+    "build_prod": "tsc -b tsconfig.prod.json && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview"
   },

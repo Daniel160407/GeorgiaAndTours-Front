@@ -1,0 +1,118 @@
+.add-tour-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  padding: 1.2rem 2.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 
+    0 6px 16px rgba(79, 172, 254, 0.3),
+    0 3px 8px rgba(0, 242, 254, 0.15);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #3a9df8 0%, #00d9e6 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+  }
+  
+  &::after {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 3rem;
+    font-weight: 300;
+    opacity: 0.1;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: -1;
+  }
+  
+  p {
+    position: relative;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0;
+    padding-left: 2rem;
+    transition: transform 0.3s ease;
+    
+    &::before {
+      content: '+';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.8rem;
+      font-weight: 300;
+      transition: all 0.3s ease;
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 12px 24px rgba(79, 172, 254, 0.4),
+      0 6px 16px rgba(0, 242, 254, 0.25);
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    &::after {
+      transform: translate(-50%, -50%) scale(1.5);
+      opacity: 0.15;
+    }
+    
+    p {
+      transform: translateX(4px);
+      
+      &::before {
+        transform: translateY(-50%) rotate(90deg);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      }
+    }
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 12px rgba(79, 172, 254, 0.4),
+      0 2px 6px rgba(0, 242, 254, 0.25);
+  }
+  
+  // Optional animation for initial load
+  animation: pulse 2.5s infinite;
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 
+        0 6px 16px rgba(79, 172, 254, 0.3),
+        0 3px 8px rgba(0, 242, 254, 0.15);
+    }
+    50% {
+      box-shadow: 
+        0 6px 24px rgba(79, 172, 254, 0.5),
+        0 3px 12px rgba(0, 242, 254, 0.25);
+    }
+    100% {
+      box-shadow: 
+        0 6px 16px rgba(79, 172, 254, 0.3),
+        0 3px 8px rgba(0, 242, 254, 0.15);
+    }
+  }
+}
