@@ -129,7 +129,7 @@
       }
     }
     
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 1.1rem 1.4rem;
       border: 1px solid #e2e8f0;
@@ -142,6 +142,11 @@
         inset 0 2px 5px rgba(0, 0, 0, 0.02),
         0 1px 3px rgba(0, 0, 0, 0.03);
       font-family: inherit;
+      appearance: none; // ✅ removes default arrow for custom look
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234a5568' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 14px;
       
       &::placeholder {
         color: #a0aec0;

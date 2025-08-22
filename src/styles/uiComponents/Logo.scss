@@ -1,15 +1,21 @@
-// Variables
-$primary-color: #2c3e50;       // Dark blue-gray
-$secondary-color: #e74c3c;     // Warm accent color
-$font-stack: 'Playfair Display', serif; // Elegant serif font
+$primary-color: #2c3e50;
+$secondary-color: #e74c3c;
+$font-stack: 'Playfair Display', serif;
 $transition-speed: 0.3s;
 
 .logo {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: relative;
   padding: 0.5rem 0;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
+
+  .logo-img {
+    width: 70px;
+    height: 70px;
+  }
 
   h1 {
     font-family: $font-stack;

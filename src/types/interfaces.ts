@@ -77,3 +77,9 @@ export interface User {
   email: string;
   name?: string;
 }
+
+export interface UserFormData {
+  name: string;
+  email: string;
+  password: string;
+}

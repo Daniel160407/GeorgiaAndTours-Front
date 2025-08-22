@@ -1,0 +1,231 @@
+.chat-helper {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(calc(100% - 60px));
+  height: 60px;
+
+  &.open {
+    transform: translateY(0);
+    height: 400px;
+  }
+
+  .chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    cursor: pointer;
+    
+    .chat-title {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+        animation: pulse 2s infinite;
+      }
+    }
+    
+    .chat-toggle {
+      font-size: 1.25rem;
+      font-weight: 300;
+    }
+  }
+
+  .chat-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 60px);
+  }
+
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    animation: messageSlideIn 0.3s ease-out;
+    
+    &.bot {
+      align-self: flex-start;
+      background: #f1f5f9;
+      color: #374151;
+      border-bottom-left-radius: 4px;
+    }
+    
+    &.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message-content {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+      text-align: right;
+    }
+  }
+
+  .input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    
+    input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+      
+      &:disabled {
+        background: #f9fafb;
+        color: #9ca3af;
+      }
+    }
+    
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      
+      &:hover:not(:disabled) {
+        background: #4f46e5;
+        transform: scale(1.05);
+      }
+      
+      &:active:not(:disabled) {
+        transform: scale(0.95);
+      }
+      
+      &:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+      }
+      
+      svg {
+        width: 20px;
+        height: 20px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  .connection-status {
+    padding: 0.5rem 1rem;
+    background: #ffedd5;
+    color: #ea580c;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-helper {
+    right: 10px;
+    bottom: 10px;
+    width: calc(100vw - 20px);
+    
+    &.open {
+      height: 350px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-helper {
+    transition: none;
+    
+    .message {
+      animation: none;
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+  }
+}

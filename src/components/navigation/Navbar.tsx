@@ -31,7 +31,7 @@ const Navbar = ({ adminMode }) => {
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
-        <Logo />
+        <Logo adminMode={adminMode} />
         <nav className="desktop-nav">
           <ul>
             {filteredItems.map(({ label, path }) => (
