@@ -11,6 +11,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
     duration: '',
     direction: '',
     language: '',
+    badge: '',
   });
 
   const handleChange = (e) => {
@@ -32,16 +33,12 @@ const TourForm = ({ onSubmit, onCancel }) => {
         <h2>Create New Tour</h2>
         <div className="header-decoration"></div>
         <div className="form-header">
-            <button
-              className="close-btn"
-              onClick={() => onCancel(false)}
-              aria-label="Close form"
-            >
-              &times;
-            </button>
-          </div>
+          <button className="close-btn" onClick={() => onCancel(false)} aria-label="Close form">
+            &times;
+          </button>
+        </div>
       </div>
-      
+
       <form className="tour-form" onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">
@@ -58,7 +55,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="name">
               <i className="icon-tour"></i> Tour Name
@@ -73,7 +70,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               required
             />
           </div>
-          
+
           <div className="form-group full-width">
             <label htmlFor="description">
               <i className="icon-description"></i> Description
@@ -88,7 +85,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               rows="4"
             ></textarea>
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="requirements">
               <i className="icon-requirements"></i> Requirements
@@ -103,7 +100,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="price">
               <i className="icon-price"></i> Price ($)
@@ -119,7 +116,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               min="0"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="duration">
               <i className="icon-duration"></i> Duration
@@ -134,7 +131,7 @@ const TourForm = ({ onSubmit, onCancel }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="direction">
               <i className="icon-direction"></i> Direction
@@ -149,23 +146,40 @@ const TourForm = ({ onSubmit, onCancel }) => {
               required
             />
           </div>
-          
+
+          <div className="form-group">
+            <label htmlFor="badge">
+              <i className="icon-direction"></i> Badge
+            </label>
+            <input
+              type="text"
+              id="badge"
+              name="badge"
+              value={formData.badge}
+              onChange={handleChange}
+              placeholder="Tour badge"
+              required
+            />
+          </div>
+
           <div className="form-group">
             <label htmlFor="language">
               <i className="icon-language"></i> Language
             </label>
-            <input
-              type="text"
+            <select
               id="language"
               name="language"
               value={formData.language}
               onChange={handleChange}
-              placeholder="English, Spanish, etc."
               required
-            />
+            >
+              <option value="">Select language</option>
+              <option value="ENG">ENG</option>
+              <option value="RUS">RUS</option>
+            </select>
           </div>
         </div>
-        
+
         <div className="form-actions">
           <button type="submit" className="submit-btn">
             <i className="icon-add"></i> Add Tour

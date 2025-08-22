@@ -1,45 +1,53 @@
-// TourEditForm.scss
 .admin-tour-form {
-  // Center the form on the screen
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-  
-  // Form styling
+
   background: rgba(255, 255, 255, 0.95);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 500px;
-  // backdrop-filter: blur(10px); // Commented out to test if this causes flickering; re-enable if needed
-  
-  // Optimize rendering
+  max-width: 700px;
   will-change: transform;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
   backface-visibility: hidden;
-  
-  // Responsive adjustments
-  @media (max-width: 600px) {
-    width: 90%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    max-width: 95%;
     padding: 1.5rem;
   }
 
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 2rem;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .form-group {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
 
     label {
-      display: block;
       font-size: 0.9rem;
       font-weight: 600;
       color: #333;
       margin-bottom: 0.5rem;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid #ddd;
@@ -48,6 +56,8 @@
       color: #333;
       background: #f9f9f9;
       transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+      appearance: none; // hides native arrows for consistent styling
+      font-family: inherit;
 
       &:focus {
         outline: none;
@@ -61,13 +71,22 @@
         font-style: italic;
       }
     }
+
+    select {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg fill='%234a90e2' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
   }
 
   .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
 
     button {
       padding: 0.75rem 1.5rem;
@@ -82,7 +101,6 @@
       -moz-backface-visibility: hidden;
       backface-visibility: hidden;
 
-      // Submit button
       &:first-child {
         background: #4a90e2;
         color: #fff;
@@ -92,7 +110,6 @@
         }
       }
 
-      // Cancel button
       &:last-child {
         background: #f0f0f0;
         color: #333;
@@ -105,7 +122,6 @@
   }
 }
 
-// Background overlay
 body:has(.admin-tour-form) {
   &::before {
     content: '';
@@ -118,6 +134,6 @@ body:has(.admin-tour-form) {
     z-index: 999;
     transition: opacity 0.3s ease;
     will-change: opacity;
-    pointer-events: none; // Prevents interference with hover events
+    pointer-events: none;
   }
 }

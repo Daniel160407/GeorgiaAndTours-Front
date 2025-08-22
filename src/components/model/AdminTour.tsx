@@ -6,6 +6,7 @@ const AdminTour = ({ tour, onEdit, onDelete, onEditStart, isEditing }) => {
   return (
     <div className="admin-tour">
       <div className="image-container">
+        {tour.badge && <div className="tour-badge">{tour.badge}</div>}
         <img src={tour.imageUrl} alt={tour.name} />
       </div>
       <div className="tour-info">

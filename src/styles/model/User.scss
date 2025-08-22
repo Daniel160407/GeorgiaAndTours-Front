@@ -20,6 +20,7 @@ $border-color: #f1f5f9;
   position: relative;
   overflow: hidden;
   margin-bottom: 0.75rem;
+  min-height: 50px;
 
   &:hover {
     transform: translateY(-3px);
