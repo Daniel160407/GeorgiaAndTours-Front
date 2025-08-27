@@ -14,6 +14,7 @@ import '../styles/pages/AdminContact.scss';
 import Message from '../components/model/Message';
 import Navbar from '../components/navigation/Navbar';
 import type { MessageObj, ServerMessage, User } from '../types/interfaces';
+import { useNavigate } from 'react-router-dom';
 
 const AdminContact = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -31,6 +32,7 @@ const AdminContact = () => {
   const isInitialized = useRef(false);
   const selectedUserRef = useRef<User | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -172,6 +174,12 @@ const AdminContact = () => {
       wsManager.current?.removeConnectionListener('error', errorHandler);
     };
   }, [fetchUsers, handleServerMessages, retryConnection]);
+
+  useEffect(() => {
+    if (!Cookies.get('token')) {
+      navigate('/login');
+    }
+  }, []);
 
   useEffect(() => {
     selectedUserRef.current = selectedUser;

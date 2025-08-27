@@ -3,12 +3,15 @@ import Navbar from '../components/navigation/Navbar';
 import useAxios from '../hooks/UseAxios';
 import Slides from '../components/uiComponents/Slides';
 import AdminToursList from '../components/lists/AdminToursList';
+import Cookies from 'js-cookie';
 import '../styles/pages/AdminHome.scss';
+import { useNavigate } from 'react-router-dom';
 
 const AdminHome = () => {
   const [language, setLanguage] = useState('ENG');
   const [sortBy, setSortBy] = useState('name');
   const [tours, setTours] = useState([]);
+  const navigate = useNavigate();
 
   const handleEdit = async (updatedTour) => {
     const response = await useAxios.put('/tours', updatedTour);
@@ -24,6 +27,12 @@ const AdminHome = () => {
     const response = await useAxios.post('/tours', newTour);
     setTours(response.data);
   };
+
+  useEffect(() => {
+    if (!Cookies.get('token')) {
+      navigate('/login');
+    }
+  }, []);
 
   useEffect(() => {
     const fetchTours = async () => {
