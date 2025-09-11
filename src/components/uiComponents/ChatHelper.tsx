@@ -52,7 +52,7 @@ const ChatHelper = () => {
       try {
         const userEmail = Cookies.get('email');
         if (userEmail) {
-          const response = await useAxios(`/messages?email=${userEmail}`);
+          const response = await useAxios.get(`/messages?email=${userEmail}`);
           const fetchedMessages: MessageObj[] = Array.isArray(response.data)
             ? response.data
             : [response.data];

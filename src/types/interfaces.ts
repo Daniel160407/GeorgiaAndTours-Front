@@ -28,6 +28,16 @@ export interface ClientChatProps {
   setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+export interface PostFormProps {
+  userAvatar?: string;
+  onSubmit?: (data: { content: string; images: File[] }) => void;
+}
+
+export interface PostData {
+  content: string;
+  images: File[];
+}
+
 //objects
 export interface Tour {
   id: number;
@@ -82,4 +92,17 @@ export interface UserFormData {
   name: string;
   email: string;
   password: string;
+}
+
+export interface PostObj {
+  id: number;
+  date: string;
+  text: string;
+  imageUrl: string;
+}
+
+export interface ImagePreview {
+  id: string;
+  url: string;
+  file: File;
 }

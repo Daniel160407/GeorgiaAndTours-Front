@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import useAxios from '../hooks/UseAxios';
 import WebSocketManager from '../hooks/WebSocketManager';
 import UsersList from '../components/lists/UsersList';
+import Cookies from 'js-cookie';
 import {
   ADMIN_ROLE,
   CLIENT_ROLE,
@@ -36,7 +37,11 @@ const AdminContact = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await useAxios.get('/user');
+      const response = await useAxios.get('/user', {
+        headers: {
+          Authorization: Cookies.get('token') || '',
+        },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);

@@ -188,7 +188,7 @@ const ClientChat: React.FC<ClientChatProps> = ({ userEmail, formData, setShowFor
     const newMessage: MessageObj = {
       senderEmail: userEmail,
       receiverEmail: '',
-      sender: Cookies.get('username') || CLIENT_ROLE,
+      sender: CLIENT_ROLE,
       receiver: ADMIN_ROLE,
       payload: inputText,
     };

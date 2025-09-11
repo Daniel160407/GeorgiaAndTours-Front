@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiX } from 'react-icons/fi';
 import '../../styles/navigation/Navbar.scss';
@@ -12,6 +12,7 @@ const Navbar = ({ adminMode }) => {
   const navItems = [
     { label: 'Home', path: adminMode ? '/adminpanel/home' : '/home', adminItem: false },
     { label: 'Contact', path: adminMode ? '/adminpanel/contact' : '/contact', adminItem: false },
+    { label: 'Posts', path: adminMode ? '/adminpanel/posts' : '/posts', adminItem: false },
   ];
 
   const filteredItems = navItems.filter((item) => !item.adminItem || (adminMode && item.adminItem));
